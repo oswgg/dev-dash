@@ -1,3 +1,4 @@
+import { ImplementationService } from "../../../data/mongoose/models";
 
 
 
@@ -5,10 +6,9 @@
 export class CreateImplementationDto {
     private constructor(
         public userId: string,
-        public service: string,
+        public service: ImplementationService,
         public accessToken: string,
         public username: string,
-        public enabled: boolean
     ) {}
     
     static create(data: { [key: string]: any }): [string?, CreateImplementationDto?]  {
@@ -18,11 +18,10 @@ export class CreateImplementationDto {
         if (!service) return ['Service is required'];
         if (!accessToken) return ['AccessToken is required'];
         if (!username) return ['Username is required'];
-        if (!enabled) return ['Enabled is required'];
         
         return [
             undefined,
-             new CreateImplementationDto(userId, service, accessToken, username, enabled)
+             new CreateImplementationDto(userId, service, accessToken, username)
         ];
     }
 }
