@@ -1,1 +1,0 @@
-export * from '../use-cases/user/register.use-case';

@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Res } from "@nestjs/common";
 import { Response } from "express";
-import { RegisterUserDto } from "../../../domain/dtos"
-import { RegisterUser } from "../../../domain/use-cases";
+import { RegisterUserDto } from "../../../domain/dtos/user"
+import { RegisterUser } from "../../../domain/use-cases/user";
 import { UserRepository } from "../../../domain/repositories";
 
 

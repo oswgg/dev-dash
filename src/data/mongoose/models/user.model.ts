@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 
-const userSchma = new Schema({
+const userSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -15,20 +15,10 @@ const userSchma = new Schema({
         type: String,
         required: true,
     },
-    integrations: {
-        github: {
-            accessToken: String,
-            username: String,
-            enabled: {
-                type: Boolean,
-                default: false
-            }
-        }
-    },
     createdAt: {
         type: Date,
         default: Date.now
     }
 })
 
-export const UserModel = mongoose.model('User', userSchma);
+export const UserModel = mongoose.model('User', userSchema);

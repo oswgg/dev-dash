@@ -1,6 +1,6 @@
 import { JwtAdapter, SignTokenFunction } from "../../../config/jwt";
 import { UserMapper } from "../../../infrastructure/mappers";
-import { RegisterUserDto } from "../../dtos";
+import { RegisterUserDto } from "../../dtos/user";
 import { UserEntity } from "../../entities/user.entity";
 import { UserRepository } from "../../repositories";
 
