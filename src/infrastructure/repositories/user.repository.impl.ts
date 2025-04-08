@@ -1,5 +1,6 @@
 import { UserDataSource } from "../../domain/datasources";
-import { RegisterUserDto } from "../../domain/dtos";
+import { AuthenticateUserDto, RegisterUserDto } from "../../domain/dtos/user";
+import { UserEntity } from "../../domain/entities";
 import { UserRepository } from "../../domain/repositories";
 
 
@@ -14,4 +15,8 @@ export class UserRepositoryImpl implements UserRepository {
         return this.userDataSource.register(registerUserDto);
     }
 
+    
+    async authenticate(authenticateUserDto: UserEntity['id']): Promise<UserEntity> {
+        return this.userDataSource.authenticate(authenticateUserDto);
+    }
 }

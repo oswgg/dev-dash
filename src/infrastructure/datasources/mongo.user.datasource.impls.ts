@@ -1,7 +1,8 @@
-import { BcryptAdapter, hashFunction } from "../../config/bcrypt";
+import { BcryptAdapter, comparePasswordFunction, hashPasswordFunction } from "../../config/bcrypt";
+import { CompareTokenFunction, JwtAdapter } from "../../config/jwt";
 import { UserModel } from "../../data/mongoose/models";
 import { UserDataSource } from "../../domain/datasources";
-import { RegisterUserDto } from "../../domain/dtos";
+import { AuthenticateUserDto, RegisterUserDto } from "../../domain/dtos/user";
 import { UserEntity } from "../../domain/entities";
 import { UserMapper } from "../mappers";
 
@@ -9,8 +10,10 @@ import { UserMapper } from "../mappers";
 
 export class MongoUserDataSourceImpls implements UserDataSource{
     constructor(
-        private readonly hashPassword: hashFunction = BcryptAdapter.hash
-    ) {}
+        private readonly hashPassword: hashPasswordFunction = BcryptAdapter.hash,
+        private readonly compartePassword: comparePasswordFunction = BcryptAdapter.compare,
+        private readonly compareToken:  CompareTokenFunction = JwtAdapter.compare
+    ) { }
 
     async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
         try {
@@ -24,6 +27,20 @@ export class MongoUserDataSourceImpls implements UserDataSource{
                 email,
                 password: await this.hashPassword(password)
             });
+            
+            const userEntity = UserMapper.fromObjectToEntity(user);
+            
+            return userEntity;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    async authenticate(userID: UserEntity['id']): Promise<UserEntity> {
+        try {
+            
+            const user = await UserModel.findOne({ _id: userID });
+            if (!user) throw new Error('User not found');
             
             const userEntity = UserMapper.fromObjectToEntity(user);
             
