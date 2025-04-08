@@ -2,7 +2,7 @@ import { BcryptAdapter, comparePasswordFunction, hashPasswordFunction } from "..
 import { CompareTokenFunction, JwtAdapter } from "../../config/jwt";
 import { UserModel } from "../../data/mongoose/models";
 import { UserDataSource } from "../../domain/datasources";
-import { AuthenticateUserDto, RegisterUserDto } from "../../domain/dtos/user";
+import { AuthenticateUserDto, LoginUserDto, RegisterUserDto } from "../../domain/dtos/user";
 import { UserEntity } from "../../domain/entities";
 import { UserMapper } from "../mappers";
 
@@ -11,7 +11,7 @@ import { UserMapper } from "../mappers";
 export class MongoUserDataSourceImpls implements UserDataSource{
     constructor(
         private readonly hashPassword: hashPasswordFunction = BcryptAdapter.hash,
-        private readonly compartePassword: comparePasswordFunction = BcryptAdapter.compare,
+        private readonly comparePassword: comparePasswordFunction = BcryptAdapter.compare,
         private readonly compareToken:  CompareTokenFunction = JwtAdapter.compare
     ) { }
 
@@ -31,6 +31,22 @@ export class MongoUserDataSourceImpls implements UserDataSource{
             const userEntity = UserMapper.fromObjectToEntity(user);
             
             return userEntity;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    async login(loginUserDto: LoginUserDto): Promise<UserEntity> { 
+        const { email, password } = loginUserDto;
+        try {
+            const user = await UserModel.findOne({ email });
+            if (!user) throw new Error('Invalid credentials');
+            
+            const isPasswordCorrect = await this.comparePassword(password, user.password);
+            if (!isPasswordCorrect) throw new Error('Invalid credentials');
+            
+            return UserMapper.fromObjectToEntity(user);
+            
         } catch (error) {
             throw error;
         }
