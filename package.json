@@ -6,6 +6,9 @@
   "author": "oswgg",
   "type": "commonjs",
   "main": "app.ts",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsnd --env-file=.env --respawn --clear src/main.ts"
@@ -14,6 +17,7 @@
     "@nestjs/common": "^11.0.13",
     "@nestjs/core": "^11.0.13",
     "@nestjs/platform-express": "^11.0.13",
+    "@octokit/rest": "^21.1.1",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
@@ -21,7 +25,6 @@
     "env-var": "^7.5.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.2",
-    "octokit": "^4.1.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },

@@ -1,3 +1,5 @@
+'use strict';
+
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ImplementationsController } from "./implementations.controller";
 import { ImplementationRepository } from "../../../domain/repositories";

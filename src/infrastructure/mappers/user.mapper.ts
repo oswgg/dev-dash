@@ -20,7 +20,7 @@ export class UserMapper {
         );
     }
     
-    static toResponse(user: UserEntity): Omit<UserEntity, 'password'> {
+    static noPassword(user: UserEntity): Omit<UserEntity, 'password'> {
         const { password, ...safeUser } = user ;
         return safeUser;
     }

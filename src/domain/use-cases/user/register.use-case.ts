@@ -24,7 +24,7 @@ export class RegisterUser {
         
         const userTokenResponse: UserTokenResponse = {
             token: token,
-            user: UserMapper.toResponse(user)
+            user: UserMapper.noPassword(user)
         }
         
         return userTokenResponse;
