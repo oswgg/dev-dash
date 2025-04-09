@@ -2,6 +2,7 @@ import { Inject, Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { AuthUser } from "../../domain/use-cases/user/auth-user.use-case";
 import { UserRepository } from "../../domain/repositories";
+import { UserMapper } from "../../infrastructure/mappers";
 
 
 
@@ -19,7 +20,7 @@ export class AuthMiddleware implements NestMiddleware {
 
         new AuthUser(this.userRepository).execute({ token })
             .then(user => {
-                req.user = user;
+                req.user = UserMapper.noPassword(user);
                 next();
             })
             .catch(error => {

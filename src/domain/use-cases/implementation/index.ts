@@ -1,3 +1,3 @@
 
 
-export * from "./create-implementation.use-case";
+export * from "./create-github-implementation.use-case";

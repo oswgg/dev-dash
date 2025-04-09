@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
+export type ImplementationService = "github";
 
 const implementationSchema = new Schema({
     userId: {
