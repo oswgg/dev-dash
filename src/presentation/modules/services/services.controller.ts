@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Res, Req } from "@nestjs/common";
 import { Request, Response } from "express";
-import { ImplementationModel, UserModel } from "../../../data/mongoose/models";
+import { GithubGetPullRequest } from "../../../domain/use-cases/services/github";
+import { ImplementationRepository } from "../../../domain/repositories";
 
 
 
@@ -9,7 +10,9 @@ import { ImplementationModel, UserModel } from "../../../data/mongoose/models";
 @Controller('services')
 export class ServicesController {
     
-    constructor() { }
+    constructor(
+        private readonly implemetationsRepository: ImplementationRepository
+    ) { }
     
     @Get('github/pull-requests')
     async getNotifications(
@@ -17,7 +20,12 @@ export class ServicesController {
         @Req() req: Request,
         @Res() res: Response): Promise<any> {
         
-
-        
+            new GithubGetPullRequest(this.implemetationsRepository).execute(req.user!.id)
+                .then(prs => {
+                    res.json(prs);
+                })
+                .catch(error => {
+                    res.status(400).json({ error: error.message });
+                });
     }
 }
