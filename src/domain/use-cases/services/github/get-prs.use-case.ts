@@ -13,13 +13,13 @@ export class GithubGetPullRequest {
     ) { }
     
     async execute(userId: any): Promise<PullRequestEntity[] | null> {
-        const githubImplementation = await this.implementationsRepository.getOne({ userId, service: 'github' })
-        if (!githubImplementation) throw new Error('User has no github implementation');
+        const ghImplementation = await this.implementationsRepository.getOne({ userId, service: 'github' })
+        if (!ghImplementation) throw new Error('User has no github implementation');
         
         const OctokitAdapter = await this.octokitAdapter;
-        const octoClient = new OctokitAdapter(githubImplementation.accessToken);
+        const octoClient = new OctokitAdapter(ghImplementation.accessToken);
         
-        const pulLRequests = await octoClient.getPullRequests({ query: 'type:pr user:oswgg state:open' });
+        const pulLRequests = await octoClient.getPullRequests({ query: `type:pr user:${ghImplementation.username} state:open` });
         
         return pulLRequests;
     }

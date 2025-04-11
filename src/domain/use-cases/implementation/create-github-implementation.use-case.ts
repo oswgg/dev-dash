@@ -32,11 +32,21 @@ export class CreateGithubImplementation {
             
             const { access_token } = await response.json();
             
+            const userResponse = await fetch('https://api.github.com/user', {
+                headers: {
+                    'Authorization': `token ${access_token}`,
+                    'Accept': 'application/json'
+                }
+            })
+            
+            const userData = await userResponse.json();
+            const ghUsername = userData.login;
+            
             const implementation = await this.implementationRepository.create({
                 userId: userId,
                 service: 'github',
                 accessToken: access_token,
-                username: username
+                username: ghUsername
             });
             
             return implementation;

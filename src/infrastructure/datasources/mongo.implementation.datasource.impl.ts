@@ -25,6 +25,7 @@ export class MongoImplementationDataSourceImpl implements ImplementationDataSour
                 service,
                 accessToken,
                 username,
+                enabled: true
             });
 
             return ImplementationMapper.fromObjectToEntity(implementation);
