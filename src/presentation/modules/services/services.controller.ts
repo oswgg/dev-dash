@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Res, Req } from "@nestjs/common";
+import { Controller, Get, Param, Res, Req, Post } from "@nestjs/common";
 import { Request, Response } from "express";
 import { GithubGetPullRequest } from "../../../domain/use-cases/services/github";
 import { ImplementationRepository } from "../../../domain/repositories";
@@ -28,4 +28,14 @@ export class ServicesController {
                     res.status(400).json({ error: error.message });
                 });
     }
+    
+    @Post('github/events')
+    async eventHandler(
+        @Req() req: Request,
+        @Res() res: Response): Promise<any> {
+            
+            console.log(req.body);
+        
+    }
+   
 }
