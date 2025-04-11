@@ -1,5 +1,4 @@
 import { Octokit } from '@octokit/rest';
-import { OctokitResponse } from '@octokit/types';
 import { PullRequestMapper } from '../infrastructure/mappers';
 import { PullRequestEntity } from '../domain/entities';
 
