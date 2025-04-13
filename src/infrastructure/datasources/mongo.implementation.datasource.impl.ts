@@ -34,10 +34,10 @@ export class MongoImplementationDataSourceImpl implements ImplementationDataSour
         }
     }
 
-    async getAll(filters: QueryFilter<ImplementationEntity>[] | Partial<ImplementationEntity>): Promise<ImplementationEntity[] | null> {
+    async getAll(filters: QueryFilter<ImplementationEntity>[] | Partial<ImplementationEntity>): Promise<ImplementationEntity[]> {
         if (isQueryFilter(filters)) {
             // Todo: implementar una funcion que transforme el array de queryfilter en un objeto de mongoose
-            return null;
+            return [];
         }
 
         const implementations = await ImplementationModel.find(filters);
@@ -46,7 +46,7 @@ export class MongoImplementationDataSourceImpl implements ImplementationDataSour
             return implementations.map(ImplementationMapper.fromObjectToEntity);
         }
 
-        return null;
+        return [];
     }
     
     async getOne(filters: QueryFilter<ImplementationEntity>[] | Partial<ImplementationEntity>): Promise<ImplementationEntity | null> {

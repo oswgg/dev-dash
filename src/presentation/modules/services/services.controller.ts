@@ -16,7 +16,6 @@ export class ServicesController {
     
     @Get('github/pull-requests')
     async getNotifications(
-        @Param('service') service: string,
         @Req() req: Request,
         @Res() res: Response): Promise<any> {
 

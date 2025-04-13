@@ -17,7 +17,7 @@ export class ImplementationRepositoryImpl implements ImplementationRepository {
         return this.implementationDataSource.create(createImplementationDto);
     }
     
-    async getAll(filters: QueryFilter<ImplementationEntity>[] | Partial<ImplementationEntity>): Promise<ImplementationEntity[] | null> {
+    async getAll(filters: QueryFilter<ImplementationEntity>[] | Partial<ImplementationEntity>): Promise<ImplementationEntity[]> {
         return this.implementationDataSource.getAll(filters);
     }
     
