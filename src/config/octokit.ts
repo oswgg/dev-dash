@@ -1,6 +1,7 @@
 import { Octokit } from '@octokit/rest';
 import { PullRequestMapper } from '../infrastructure/mappers';
 import { PullRequestEntity } from '../domain/entities';
+import { Logger } from '@nestjs/common';
 
 export interface IOctokitAdapter {
     getPullRequests(
@@ -15,11 +16,13 @@ export async function getOctokitAdapter(): Promise<OctokitAdapterConstructor> {
 
     return class OctokitAdapter implements IOctokitAdapter {
         private client: Octokit;
+        private logger: Logger;
 
         constructor(accessToken: string) {
             this.client = new Octokit({
                 auth: accessToken
             });
+            this.logger = new Logger('OctokitAdapter');
         }
 
         async getPullRequests(
@@ -33,6 +36,7 @@ export async function getOctokitAdapter(): Promise<OctokitAdapterConstructor> {
                 return PullRequestMapper.fromOctokitToEntities(res.data.items);
             })
             .catch(err => {
+                this.logger.error(err);
                 return null;
             });
         }

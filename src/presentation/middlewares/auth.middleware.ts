@@ -16,7 +16,9 @@ export class AuthMiddleware implements NestMiddleware {
 
     use(req: Request, res: Response, next: NextFunction) {
         const auth = req.headers.authorization as string;
-        if (!auth.startsWith('Bearer ')) return res.status(401).json({ error: 'Invalid authorization header' });
+        if (!auth)                       return res.status(401).json({ error: 'Authorization header is missing' });
+        if (!auth.toLowerCase().startsWith('bearer ')) return res.status(401).json({ error: 'Invalid authorization header' });
+
         const token = auth.split(' ')[1];
         if (!token) return res.status(401).json({ error: 'Token is missing' });
 

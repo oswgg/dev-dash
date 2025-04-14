@@ -6,24 +6,38 @@ export class PullRequestEntity {
     constructor(
         public id: number,
         public title: string,
-        public url: string,
         public number: number,
-        public user: string,
-        public labels: Array<{ name: string, color: string }>,
         public state: string,
+        public author: string,
+        public authorAvatar: string,
         public createdAt: Date,
+        public updatedAt: Date,
+        public url: string,
+        public repositoryName: string,
+        public isDraft: boolean,
+        public isMerged: boolean,
+        public comments: number,
+        public labels: Array<{ name: string, color: string }>,
+        public assignees: Array<{ login: string, avatar_url: string }>
     ) { }
     
     static create(data: PullRequestEntity): PullRequestEntity {
         return new PullRequestEntity(
             data.id,
             data.title,
-            data.url,
             data.number,
-            data.user,
-            data.labels,
             data.state,
-            data.createdAt,
+            data.author,
+            data.authorAvatar,
+            new Date(data.createdAt),
+            new Date(data.updatedAt),
+            data.url,
+            data.repositoryName,
+            data.isDraft,
+            data.isMerged,
+            data.comments,
+            data.labels,
+            data.assignees
         )
     }
 }
