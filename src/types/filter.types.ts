@@ -1,9 +1,10 @@
-type QueryOperator = 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'between' | 'like' | 'contains';
+export type QueryOperator = 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'between' | 'like' | 'contains';
 
 export type QueryFilter<T> = {
-    field: keyof T;
-    operator: QueryOperator;
-    value: any;
+    [K in keyof T]: {
+        operator: QueryOperator;
+        value: any;
+    } | T[K];
 }
 
 export const isQueryFilter = (input: any): boolean => {
@@ -13,4 +14,10 @@ export const isQueryFilter = (input: any): boolean => {
             f.operator &&
             f.value
         );
+}
+
+
+export type QueryUpdate<T> = {
+    where:  QueryFilter<Partial<T>>;
+    updated: Partial<T>;
 }

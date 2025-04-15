@@ -1,11 +1,7 @@
-import { envs } from "../../../config/envs";
+import { GithubAdapter } from "../../../config/github";
 import { CreateGithubImplementationDto } from "../../dtos/implementation";
 import { ImplementationEntity } from "../../entities";
 import { ImplementationRepository } from "../../repositories";
-
-
-const GITHUB_CLIENT_ID = envs.GITHUB_CLIENT_ID;
-const GITHUB_CLIENT_SECRET = envs.GITHUB_CLIENT_SECRET;
 
 
 export class CreateGithubImplementation {
@@ -14,40 +10,18 @@ export class CreateGithubImplementation {
     ) { }
     
     async execute(createGithubImplementation: CreateGithubImplementationDto): Promise<ImplementationEntity> {
-        const { code, userId, username } = createGithubImplementation;
+        const { code, userId } = createGithubImplementation;
 
         try {
-
-            const response = await fetch('https://github.com/login/oauth/access_token', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                },
-                body: new URLSearchParams({
-                    client_id: GITHUB_CLIENT_ID,
-                    client_secret: GITHUB_CLIENT_SECRET,
-                    code: code as string
-                })
-            })
             
-            const data = await response.json();
-            const { access_token } = data;
-            
-            const userResponse = await fetch('https://api.github.com/user', {
-                headers: {
-                    'Authorization': `token ${access_token}`,
-                    'Accept': 'application/json'
-                }
-            })
-            
-            const userData = await userResponse.json();
-            const ghUsername = userData.login;
+            const { access_token, refresh_token } = await GithubAdapter.getTokenByCode(code);
+            const { login: ghUsername }  = await GithubAdapter.getUserData(access_token);
             
             const implementation = await this.implementationRepository.create({
                 userId: userId,
                 service: 'github',
                 accessToken: access_token,
-                refreshToken: data.refresh_token,
+                refreshToken: refresh_token,
                 username: ghUsername
             });
             

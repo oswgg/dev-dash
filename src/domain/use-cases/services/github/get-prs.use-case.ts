@@ -17,9 +17,14 @@ export class GithubGetPullRequest {
         if (!ghImplementation) throw new Error('User has no github implementation');
         
         const OctokitAdapter = await this.octokitAdapter;
-        const octoClient = new OctokitAdapter(ghImplementation.accessToken);
+        const octoClient = new OctokitAdapter(ghImplementation.accessToken, userId);
         
-        const pulLRequests = await octoClient.getPullRequests({ query: `type:pr user:${ghImplementation.username} state:open` });
+        const queryForOpenPRs = `type:pr user:${ghImplementation.username} state:open`;
+        
+        const pulLRequests = await octoClient.getPullRequests(
+            { query: queryForOpenPRs },
+            this.implementationsRepository
+        );
         
         return pulLRequests;
     }

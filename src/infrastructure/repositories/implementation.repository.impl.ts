@@ -2,7 +2,7 @@ import { ImplementationDataSource } from "../../domain/datasources";
 import { CreateImplementationDto } from "../../domain/dtos/implementation";
 import { ImplementationEntity } from "../../domain/entities";
 import { ImplementationRepository } from "../../domain/repositories/implementation.repository";
-import { QueryFilter } from "../../types/filter.types";
+import { QueryFilter, QueryUpdate } from "../../types/filter.types";
 
 
 
@@ -27,5 +27,9 @@ export class ImplementationRepositoryImpl implements ImplementationRepository {
     
     async getById(id: any): Promise<ImplementationEntity | null> {
         return this.implementationDataSource.getById(id);
+    }
+    
+    async update(query: QueryUpdate<ImplementationEntity>): Promise<ImplementationEntity | null> {
+        return this.implementationDataSource.update(query);
     }
 } 

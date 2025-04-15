@@ -2,7 +2,7 @@ import { ImplementationModel } from "../../data/mongoose/models";
 import { ImplementationDataSource } from "../../domain/datasources";
 import { CreateImplementationDto } from "../../domain/dtos/implementation";
 import { ImplementationEntity } from "../../domain/entities";
-import { isQueryFilter, QueryFilter } from "../../types/filter.types";
+import { isQueryFilter, QueryFilter, QueryUpdate } from "../../types/filter.types";
 import { ImplementationMapper } from "../mappers/implementation.mapper";
 
 
@@ -67,6 +67,18 @@ export class MongoImplementationDataSourceImpl implements ImplementationDataSour
 
 
     async getById(id: any): Promise<ImplementationEntity | null> {
+        return null;
+    }
+    
+    async update(query: QueryUpdate<ImplementationEntity>): Promise<ImplementationEntity | null> {
+        const { where, updated } = query;
+        
+        const implementation = await ImplementationModel.findOneAndUpdate(where, updated, { new: true });
+        
+        if (implementation) {
+            return ImplementationMapper.fromObjectToEntity(implementation);
+        }
+        
         return null;
     }
 }
