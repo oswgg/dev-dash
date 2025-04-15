@@ -43,28 +43,38 @@ export class ImplementationsController {
 
     @Get('github/activate')
     async github(
-        @Res() res: Response
+        @Res() res: Response,
+        @Req() req: Request
     ): Promise<void> {
-        const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=read:user repo`;
+        const { returnTo } = req.query;
+        const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=read:user repo&state=${returnTo}`;
         res.redirect(url);
     }
     
     @Get('github/callback')
     async githubCallback(
         @Req() req: Request,
-         @Res() res: Response
+        @Res() res: Response
     ): Promise<any> {
-        const { code } = req.query;
+        const { code, state: returnTo } = req.query;
+    
         if (!code) return res.status(400).json({ error: 'Code is missing' });
-        
+    
         const user = req.user!;
-       
-        new CreateGithubImplementation(this.implementationRepository).execute({
-            code: code as string,
-            userId: user.id,
-            username: user.name
-        })
-        .then(implementation => res.status(200).json(implementation))
-        .catch(error => res.status(500).json({ error: error.message }));
+    
+        try {
+            const implementation = await new CreateGithubImplementation(this.implementationRepository).execute({
+                code: code as string,
+                userId: user.id,
+                username: user.name
+            });
+    
+            // Redirige al frontend con éxito (puedes incluir un token o id si quieres)
+            const redirectUrl = returnTo;
+            res.redirect(`${redirectUrl}?success=true`);
+        } catch (error: any) {
+            const redirectUrl = returnTo;
+            res.redirect(`${redirectUrl}?success=false&error=${encodeURIComponent(error.message)}`);
+        }
     }
 }
