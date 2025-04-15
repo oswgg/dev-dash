@@ -13,7 +13,7 @@ export class MongoImplementationDataSourceImpl implements ImplementationDataSour
     constructor() { }
 
     async create(createImplementationDto: CreateImplementationDto): Promise<ImplementationEntity> {
-        const { userId, service, accessToken, username } = createImplementationDto;
+        const { userId, service, accessToken, username, refreshToken } = createImplementationDto;
 
         try {
 
@@ -24,6 +24,7 @@ export class MongoImplementationDataSourceImpl implements ImplementationDataSour
                 userId,
                 service,
                 accessToken,
+                refreshToken,
                 username,
                 enabled: true
             });

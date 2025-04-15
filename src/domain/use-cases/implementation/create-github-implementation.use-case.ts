@@ -30,7 +30,8 @@ export class CreateGithubImplementation {
                 })
             })
             
-            const { access_token } = await response.json();
+            const data = await response.json();
+            const { access_token } = data;
             
             const userResponse = await fetch('https://api.github.com/user', {
                 headers: {
@@ -46,6 +47,7 @@ export class CreateGithubImplementation {
                 userId: userId,
                 service: 'github',
                 accessToken: access_token,
+                refreshToken: data.refresh_token,
                 username: ghUsername
             });
             

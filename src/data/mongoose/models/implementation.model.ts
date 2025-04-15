@@ -14,6 +14,7 @@ const implementationSchema = new Schema({
         required: true
     },
     accessToken: String,
+    refreshToken: String,
     username: String,
     enabled: {
         type: Boolean,

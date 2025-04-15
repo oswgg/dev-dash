@@ -8,20 +8,22 @@ export class CreateImplementationDto {
         public userId: string,
         public service: ImplementationService,
         public accessToken: string,
+        public refreshToken: string,
         public username: string,
     ) {}
     
     static create(data: { [key: string]: any }): [string?, CreateImplementationDto?]  {
-        const { userId, service, accessToken, username, enabled } = data;
+        const { userId, service, accessToken, username, refreshToken } = data;
         
         if (!userId) return ['UserId is required'];
         if (!service) return ['Service is required'];
         if (!accessToken) return ['AccessToken is required'];
+        if (!refreshToken) return ['RefreshToken is required'];
         if (!username) return ['Username is required'];
         
         return [
             undefined,
-             new CreateImplementationDto(userId, service, accessToken, username)
+             new CreateImplementationDto(userId, service, accessToken, refreshToken, username)
         ];
     }
 }

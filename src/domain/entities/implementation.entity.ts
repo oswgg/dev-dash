@@ -8,6 +8,7 @@ export class ImplementationEntity {
         public userId: string,
         public service: string,
         public accessToken: string,
+        public refreshToken: string,
         public username: string,
         public enabled: boolean
     ) {}
