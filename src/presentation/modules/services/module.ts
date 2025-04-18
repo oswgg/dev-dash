@@ -5,6 +5,8 @@ import { ImplementationRepository, UserRepository } from "../../../domain/reposi
 import { MongoImplementationDataSourceImpl, MongoUserDataSourceImpls } from "../../../infrastructure/datasources";
 import { ImplementationRepositoryImpl } from "../../../infrastructure/repositories";
 import { GithubWebhookMiddleware } from "../../middlewares/gh-webhook.middleware";
+import { GithubPrEvent } from "../../../domain/use-cases/services/github/pr-event.use-case";
+import { GithubGateway } from "../gateways/gtihub/github.gateway";
 
 @Module({
     controllers: [ServicesController],
@@ -21,6 +23,15 @@ import { GithubWebhookMiddleware } from "../../middlewares/gh-webhook.middleware
         {
             provide: UserRepository,
             useClass: MongoUserDataSourceImpls
+        },
+        {
+            provide: 'GITHUB_NOTIFICATIONS_SERVICE',
+            useClass: GithubGateway
+        },
+        {
+            provide: GithubPrEvent,
+            useFactory: (dataSource) => new GithubPrEvent(dataSource),
+            inject: ['GITHUB_NOTIFICATIONS_SERVICE']
         },
         GithubWebhookMiddleware,
         AuthMiddleware

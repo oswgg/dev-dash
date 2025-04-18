@@ -7,8 +7,13 @@ export class PullRequestMapper {
     
     static fromObjectToEntity(pr: { [key: string]: any }): PullRequestEntity {
         // Extraer el nombre del repositorio desde repository_url
-        const repoUrlParts = pr.repository_url.split('/');
-        const repositoryName = `${repoUrlParts[repoUrlParts.length - 2]}/${repoUrlParts[repoUrlParts.length - 1]}`;
+        let repositoryName: string = '';
+        
+        if (!pr.head) {
+            repositoryName = pr.repository_url.split('/').pop();
+        } else  {
+            repositoryName = pr.head.repo.full_name;
+        }
         
         return PullRequestEntity.create({
             id: pr.id,
@@ -21,6 +26,7 @@ export class PullRequestMapper {
             updatedAt: pr.updated_at,
             url: pr.html_url,
             repositoryName: repositoryName,
+            body: pr.body,
             isDraft: pr.draft || false,
             isMerged: pr.pull_request?.merged_at !== null,
             comments: pr.comments,

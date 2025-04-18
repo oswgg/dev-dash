@@ -11,15 +11,18 @@ export class GetActiveImplementations {
         private readonly implementationRepository: ImplementationRepository
     ) { }
 
-    async execute(implementation?: ImplementationService): Promise<ImplementationEntity[] | ImplementationEntity | null> {
+    async execute(userId: any, implementation?: ImplementationService): Promise<ImplementationEntity[] | ImplementationEntity | null> {
         if (!implementation) {
             return this.implementationRepository.getAll({
-                enabled: true
+                userId: userId,
+                enabled: true,
             });
         }
 
         return this.implementationRepository.getOne({
-            service: implementation, enabled: true
+            userId: userId,
+            service: implementation,
+            enabled: true
         });
     }
 }

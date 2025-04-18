@@ -18,9 +18,11 @@ export class ImplementationsController {
     
     @Get()
     async getActiveImplementations(
-        @Res() res: Response
+        @Res() res: Response,
+        @Req() req: Request
     ): Promise<any> {
-        new GetActiveImplementations(this.implementationRepository).execute()
+        const user = req.user!;
+        new GetActiveImplementations(this.implementationRepository).execute(user.id)
             .then(implementations => res.json(implementations))
             .catch(error => res.status(500).json({ error: error.message }));
     }
@@ -28,9 +30,11 @@ export class ImplementationsController {
     @Get(':implementation')
     async isImplementationActive(
         @Param  ('implementation') implementation: ImplementationService,
-        @Res() res: Response
+        @Res() res: Response,
+        @Req() req: Request
     ): Promise<any> {
-        new GetActiveImplementations(this.implementationRepository).execute(implementation)
+        const user = req.user!;
+        new GetActiveImplementations(this.implementationRepository).execute(user.id, implementation)
             .then(implementation =>  {
                 if (implementation) {
                     return res.status(200).json({ active: true });
@@ -69,7 +73,7 @@ export class ImplementationsController {
                 username: user.name
             });
     
-            // Redirige al frontend con éxito (puedes incluir un token o id si quieres)
+            // Redirige al frontend con éxito
             const redirectUrl = returnTo;
             res.redirect(`${redirectUrl}?success=true`);
         } catch (error: any) {

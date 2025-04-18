@@ -2,4 +2,7 @@ import { ImplementationsModule } from "./implementations/module";
 import { ServicesModule } from "./services/module";
 import { UserModule } from "./user/module";
 
-export const modules = [UserModule, ImplementationsModule, ServicesModule];
+// Gateways
+import { GithubGatewayModule } from "./gateways";
+
+export const modules = [UserModule, ImplementationsModule, ServicesModule, GithubGatewayModule];
