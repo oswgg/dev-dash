@@ -15,8 +15,8 @@ import { UserRepository } from "../../../domain/repositories";
     controllers: [ImplementationsController],
     providers: [
         {
-           provide: 'IMPLEMENTATION_DATASOURCE', 
-           useFactory: () =>  new MongoImplementationDataSourceImpl()
+            provide: 'IMPLEMENTATION_DATASOURCE',
+            useFactory: () => new MongoImplementationDataSourceImpl()
         },
         {
             provide: ImplementationRepository,
@@ -36,4 +36,4 @@ export class ImplementationsModule implements NestModule {
             .apply(AuthMiddleware)
             .forRoutes('implementations');
     }
- }
+}

@@ -50,8 +50,10 @@ export class ImplementationsController {
         @Res() res: Response,
         @Req() req: Request
     ): Promise<void> {
-        const { returnTo } = req.query;
-        const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=read:user repo&state=${returnTo}`;
+        const { returnTo, token } = req.query;
+        const state = JSON.stringify({ returnTo, token });
+        const encodedState = encodeURIComponent(state);
+        const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=read:user repo&state=${encodedState}&token=${token}`;
         res.redirect(url);
     }
     
@@ -60,11 +62,14 @@ export class ImplementationsController {
         @Req() req: Request,
         @Res() res: Response
     ): Promise<any> {
-        const { code, state: returnTo } = req.query;
+        const { code, state } = req.query;
+        const decodedState = decodeURIComponent(state as string);
+        const { returnTo } = JSON.parse(decodedState);
     
         if (!code) return res.status(400).json({ error: 'Code is missing' });
     
         const user = req.user!;
+        const redirectUrl = returnTo;
     
         try {
             const implementation = await new CreateGithubImplementation(this.implementationRepository).execute({
@@ -73,12 +78,9 @@ export class ImplementationsController {
                 username: user.name
             });
     
-            // Redirige al frontend con éxito
-            const redirectUrl = returnTo;
             res.redirect(`${redirectUrl}?success=true`);
         } catch (error: any) {
-            const redirectUrl = returnTo;
-            res.redirect(`${redirectUrl}?success=false&error=${encodeURIComponent(error.message)}`);
+            res.redirect(`${redirectUrl}?success=false`);
         }
     }
 }

@@ -10,7 +10,10 @@ export class PullRequestMapper {
         let repositoryName: string = '';
         
         if (!pr.head) {
-            repositoryName = pr.repository_url.split('/').pop();
+            const parts = pr.repository_url.split('/');
+            const name = parts.pop();
+            const owner = parts.pop();
+            repositoryName = `${owner}/${name}`;
         } else  {
             repositoryName = pr.head.repo.full_name;
         }

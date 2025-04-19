@@ -1,5 +1,5 @@
 import { Logger } from "@nestjs/common";
-import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
 import { GithubNotificationsService } from "../../../../domain/services";
 import { PullRequestEntity } from "../../../../domain/entities";
@@ -21,7 +21,6 @@ export class GithubGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     }
     
     sendNewPullRequest(pullRequest: PullRequestEntity): void {
-        console.log('enviando')
         this.io.emit('new-pull-request', pullRequest);
     }
     
