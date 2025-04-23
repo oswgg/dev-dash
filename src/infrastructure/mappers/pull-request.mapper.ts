@@ -31,7 +31,7 @@ export class PullRequestMapper {
             repositoryName: repositoryName,
             body: pr.body,
             isDraft: pr.draft || false,
-            isMerged: pr.pull_request?.merged_at !== null,
+            isMerged: pr?.merged ?? pr.pull_request?.merged_at !== null,
             comments: pr.comments,
             labels: pr.labels.map((label: any) => ({ 
                 name: label.name || '', 

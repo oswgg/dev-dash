@@ -30,8 +30,8 @@ import { GithubGateway } from "../gateways/gtihub/github.gateway";
         },
         {
             provide: GithubPrEvent,
-            useFactory: (dataSource) => new GithubPrEvent(dataSource),
-            inject: ['GITHUB_NOTIFICATIONS_SERVICE']
+            useFactory: (gateway, implRepo) => new GithubPrEvent(gateway, implRepo),
+            inject: ['GITHUB_NOTIFICATIONS_SERVICE', 'IMPLEMENTATION_DATASOURCE']
         },
         GithubWebhookMiddleware,
         AuthMiddleware

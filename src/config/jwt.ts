@@ -17,7 +17,7 @@ export class JwtAdapter {
 
             const options: SignOptions = {
                 expiresIn: duration 
-            }
+            } 
             
             jwt.sign(payload, JWT_SECRET, options, (err, token) => {
                 if (err) resolve(null);

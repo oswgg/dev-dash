@@ -4,6 +4,7 @@ import { GithubGetPullRequest } from "../../../domain/use-cases/services/github"
 import { ImplementationRepository } from "../../../domain/repositories";
 import { GithubPrEvent } from "../../../domain/use-cases/services/github/pr-event.use-case";
 import { PullRequestEventDto } from "../../../domain/dtos/services/github/pull-request-event.dto";
+import { GithubGetPullRequestToReview } from "../../../domain/use-cases/services/github/get-prs-to-review.use-case";
 
 
 
@@ -31,6 +32,21 @@ export class ServicesController {
             });
     }
     
+    @Get('github/pull-requests/to-review') 
+    async getPullrequestsToReview(
+        @Req() req: Request,
+        @Res() res: Response
+    ): Promise<any> {
+        
+        new GithubGetPullRequestToReview(this.implemetationsRepository).execute(req.user!.id)
+            .then(prs => {
+                res.json(prs);
+            })
+            .catch(error => {
+                res.status(400).json({ error: error.message });
+            });
+    }
+    
     @Post('github/events')
     async githubEventHandler(
         @Req() req: Request,
@@ -40,10 +56,10 @@ export class ServicesController {
         const event = req.headers['x-github-event'] as string;
         
         if (event === 'pull_request') { 
-            const { action, pull_request } = body;
+            const { action, pull_request, sender } = body;
             const ghPullRequestEventDto = PullRequestEventDto.create(action, pull_request);
-
-            this.ghPrEventUseCase.execute(ghPullRequestEventDto)
+            
+            this.ghPrEventUseCase.execute(ghPullRequestEventDto, sender)
                 .then(() => { 
                     res.status(200).json({ message: 'ok' }); 
                 })
