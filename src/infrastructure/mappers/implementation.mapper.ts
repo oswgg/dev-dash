@@ -11,7 +11,6 @@ export class ImplementationMapper {
         if (!userId) throw new Error('Implementation userId is missing');
         if (!service) throw new Error('Implementation service is missing');
         if (!accessToken) throw new Error('Implementation accessToken is missing');
-        if (!refreshToken) throw new Error('Implementation refreshToken is missing');
         if (!username) throw new Error('Implementation username is missing');
         if (!enabled) throw new Error('Implementation enabled is missing');
         

@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-export type ImplementationService = "github";
+export type ImplementationService = "github" | "monday";
 
 const implementationSchema = new Schema({
     userId: {
@@ -10,11 +10,14 @@ const implementationSchema = new Schema({
     },
     service: {
         type: String,
-        enum: ["github"],
+        enum: ["github", "monday"],
         required: true
     },
     accessToken: String,
-    refreshToken: String,
+    refreshToken: {
+        type: String,
+        default: null
+    },
     username: String,
     enabled: {
         type: Boolean,

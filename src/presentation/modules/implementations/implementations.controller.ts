@@ -4,9 +4,12 @@ import { envs } from "../../../config/envs";
 import { ImplementationRepository } from "../../../domain/repositories";
 import { CreateGithubImplementation, GetActiveImplementations } from "../../../domain/use-cases/implementation";
 import { ImplementationService } from "../../../data/mongoose/models";
+import { CreateMondayImplementationDto } from "../../../domain/dtos/implementation/create-monday-implementation.dto";
+import { ActivateMonday } from "../../../domain/use-cases/implementation/monday/monday-activate.use-case";
 
 const GITHUB_CLIENT_ID = envs.GITHUB_CLIENT_ID;
 const GITHUB_REDIRECT_URI = envs.GITHUB_REDIRECT_URI;
+const MONDAY_CLIENT_ID = envs.MONDAY_CLIENT_ID;
 
 
 @Controller('implementations')
@@ -82,5 +85,46 @@ export class ImplementationsController {
         } catch (error: any) {
             res.redirect(`${redirectUrl}?success=false`);
         }
+    }
+
+    @Get('monday/activate')
+    async monday(
+        @Res() res: Response,
+        @Req() req: Request
+    ): Promise<void> {
+        const { returnTo, token } = req.query;
+        const state = JSON.stringify({ returnTo, token });
+        const encodedState = encodeURIComponent(state);
+        const scope = encodeURIComponent('boards:read items:read');
+
+        const url = `https://auth.monday.com/oauth2/authorize?client_id=${MONDAY_CLIENT_ID}&scop=${scope}&state=${encodedState}&developer_mode=true`;
+
+        res.redirect(url);
+    }
+    
+    @Get('monday/callback')
+    async mondayCallback(
+        @Req() req: Request,
+        @Res() res: Response
+    ): Promise<any> {
+        const { code, state } = req.query;
+        const decodedState = decodeURIComponent(state as string);
+        const { returnTo } = JSON.parse(decodedState);
+        
+        if (!code) return res.status(400).json({ error: 'Code is missing' });
+        
+        const user = req.user!;
+        
+        try {
+            const [error, activateMondayDTO] = CreateMondayImplementationDto.create({ code: code as string, userId: user.id });
+            if (error) return res.status(400).json({ error: error });
+            
+            const implementation = await new ActivateMonday(this.implementationRepository).execute(activateMondayDTO!);
+            
+            res.redirect(`${returnTo}?success=true`);
+        } catch (error: any) {
+            res.redirect(`${returnTo}?success=false`);
+        }
+        
     }
 }

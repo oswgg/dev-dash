@@ -1,7 +1,7 @@
-import { GithubAdapter } from "../../../config/github";
-import { CreateGithubImplementationDto } from "../../dtos/implementation";
-import { ImplementationEntity } from "../../entities";
-import { ImplementationRepository } from "../../repositories";
+import { GithubAdapter } from "../../../../config/github";
+import { CreateGithubImplementationDto } from "../../../dtos/implementation";
+import { ImplementationEntity } from "../../../entities";
+import { ImplementationRepository } from "../../../repositories";
 
 
 export class CreateGithubImplementation {

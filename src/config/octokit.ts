@@ -3,7 +3,7 @@ import { PullRequestMapper } from '../infrastructure/mappers';
 import { PullRequestEntity } from '../domain/entities';
 import { Logger } from '@nestjs/common';
 import { ImplementationRepository } from '../domain/repositories';
-import { RenewGithubToken } from '../domain/use-cases/implementation/renew-github.token.use-case';
+import { RenewGithubToken } from '../domain/use-cases/implementation';
 
 export interface IOctokitAdapter {
     getPullRequests(

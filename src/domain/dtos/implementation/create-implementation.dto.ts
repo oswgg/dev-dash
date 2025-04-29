@@ -8,7 +8,7 @@ export class CreateImplementationDto {
         public userId: string,
         public service: ImplementationService,
         public accessToken: string,
-        public refreshToken: string,
+        public refreshToken: string | null, 
         public username: string,
     ) {}
     
@@ -18,7 +18,6 @@ export class CreateImplementationDto {
         if (!userId) return ['UserId is required'];
         if (!service) return ['Service is required'];
         if (!accessToken) return ['AccessToken is required'];
-        if (!refreshToken) return ['RefreshToken is required'];
         if (!username) return ['Username is required'];
         
         return [

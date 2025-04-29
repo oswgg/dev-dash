@@ -10,4 +10,6 @@ export const envs = {
     GITHUB_CLIENT_SECRET: get('GITHUB_CLIENT_SECRET').required().asString(),
     GITHUB_WEBHOOK_SECRET: get('GITHUB_WEBHOOK_SECRET').required().asString(),
     GITHUB_REDIRECT_URI: get('GITHUB_REDIRECT_URI').required().asString(),
+    MONDAY_CLIENT_ID: get('MONDAY_CLIENT_ID').required().asString(),
+    MONDAY_CLIENT_SECRET: get('MONDAY_CLIENT_SECRET').required().asString(),
 }

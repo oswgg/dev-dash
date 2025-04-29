@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Param, Res, Req, Body } from "@nestjs/common";
 import { Request, Response } from "express";
-import { GithubGetPullRequest } from "../../../domain/use-cases/services/github";
+import { GithubGetPullRequest } from "../../../domain/use-cases/services";
 import { ImplementationRepository } from "../../../domain/repositories";
 import { GithubPrEvent } from "../../../domain/use-cases/services/github/pr-event.use-case";
 import { PullRequestEventDto } from "../../../domain/dtos/services/github/pull-request-event.dto";
