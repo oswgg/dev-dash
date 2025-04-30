@@ -1,13 +1,16 @@
+import { Injectable } from "@nestjs/common";
 import { ImplementationModel } from "../../data/mongoose/models";
 import { ImplementationDataSource } from "../../domain/datasources";
 import { CreateImplementationDto } from "../../domain/dtos/implementation";
 import { ImplementationEntity } from "../../domain/entities";
 import { isQueryFilter, QueryFilter, QueryUpdate } from "../../types/filter.types";
 import { ImplementationMapper } from "../mappers/implementation.mapper";
+import { IMPLEMENTATION_DATASOURCE } from "../di/tokens";
 
 
 
 
+@Injectable()
 export class MongoImplementationDataSourceImpl implements ImplementationDataSource {
 
     constructor() { }

@@ -1,16 +1,17 @@
-import { Controller, Post, Body, Res } from "@nestjs/common";
+import { Controller, Post, Body, Res, Inject } from "@nestjs/common";
 import { Response } from "express";
 import { LoginUserDto, RegisterUserDto } from "../../../domain/dtos/user"
 import { RegisterUser } from "../../../domain/use-cases/user";
 import { UserRepository } from "../../../domain/repositories";
 import { LoginUser } from "../../../domain/use-cases/user/login-user.use-case";
+import { USER_REPOSITORY } from "../../../infrastructure/di/tokens";
 
 
 @Controller('user')
 export class UserController {
     
     constructor(
-        private readonly userRepository: UserRepository
+        @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository
     ) { }
     
     handleError(error: Error, res: Response) {

@@ -3,11 +3,12 @@ import { NextFunction, Request, Response } from "express";
 import { AuthUser } from "../../domain/use-cases/user/auth-user.use-case";
 import { UserRepository } from "../../domain/repositories";
 import { UserMapper } from "../../infrastructure/mappers";
+import { USER_REPOSITORY } from "../../infrastructure/di/tokens";
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
     constructor(
-        @Inject(UserRepository)
+        @Inject(USER_REPOSITORY)
         private readonly userRepository: UserRepository
     ) {}
 
