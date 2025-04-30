@@ -1,6 +1,6 @@
 import { Provider } from "@nestjs/common";
 import { USER_DATASOURCE, USER_REPOSITORY } from "../tokens";
-import { MongoUserDataSourceImpls } from "../..//datasources";
+import { MongoUserDataSourceImpls } from "../../datasources";
 import { UserRepositoryImpl } from "../../repositories";
 import { CryptProviders } from "./crypto.provider";
 
