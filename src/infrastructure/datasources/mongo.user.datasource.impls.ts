@@ -1,3 +1,4 @@
+import { Inject, Injectable } from "@nestjs/common";
 import { BcryptAdapter, comparePasswordFunction, hashPasswordFunction } from "../../config/bcrypt";
 import { CompareTokenFunction, JwtAdapter } from "../../config/jwt";
 import { UserModel } from "../../data/mongoose/models";
@@ -5,14 +6,16 @@ import { UserDataSource } from "../../domain/datasources";
 import { AuthenticateUserDto, LoginUserDto, RegisterUserDto } from "../../domain/dtos/user";
 import { UserEntity } from "../../domain/entities";
 import { UserMapper } from "../mappers";
+import { COMPARE_PASSWORD, COMPARE_TOKEN, HASH_PASSWORD } from "../di/tokens";
 
 
 
-export class MongoUserDataSourceImpls implements UserDataSource{
+@Injectable()
+export class MongoUserDataSourceImpls implements UserDataSource {
     constructor(
-        private readonly hashPassword: hashPasswordFunction = BcryptAdapter.hash,
-        private readonly comparePassword: comparePasswordFunction = BcryptAdapter.compare,
-        private readonly compareToken:  CompareTokenFunction = JwtAdapter.compare
+        @Inject(HASH_PASSWORD) private readonly hashPassword: hashPasswordFunction,
+        @Inject(COMPARE_PASSWORD) private readonly comparePassword: comparePasswordFunction ,
+        @Inject(COMPARE_TOKEN) private readonly compareToken:  CompareTokenFunction 
     ) { }
 
     async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {

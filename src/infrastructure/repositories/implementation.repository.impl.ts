@@ -1,15 +1,17 @@
+import { Inject } from "@nestjs/common";
 import { ImplementationDataSource } from "../../domain/datasources";
 import { CreateImplementationDto } from "../../domain/dtos/implementation";
 import { ImplementationEntity } from "../../domain/entities";
 import { ImplementationRepository } from "../../domain/repositories/implementation.repository";
 import { QueryFilter, QueryUpdate } from "../../types/filter.types";
-
+import { IMPLEMENTATION_DATASOURCE } from "../di/tokens";
 
 
 
 
 export class ImplementationRepositoryImpl implements ImplementationRepository { 
     constructor(
+        @Inject(IMPLEMENTATION_DATASOURCE)
         private readonly implementationDataSource: ImplementationDataSource
     ) { }
     

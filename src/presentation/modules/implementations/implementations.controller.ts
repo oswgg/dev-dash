@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, Res } from "@nestjs/common";
+import { Controller, Get, Inject, Param, Req, Res } from "@nestjs/common";
 import { Request, Response } from "express";
 import { envs } from "../../../config/envs";
 import { ImplementationRepository } from "../../../domain/repositories";
@@ -6,6 +6,7 @@ import { CreateGithubImplementation, GetActiveImplementations } from "../../../d
 import { ImplementationService } from "../../../data/mongoose/models";
 import { CreateMondayImplementationDto } from "../../../domain/dtos/implementation/create-monday-implementation.dto";
 import { ActivateMonday } from "../../../domain/use-cases/implementation/monday/monday-activate.use-case";
+import { IMPLEMENTATION_REPOSITORY } from "../../../infrastructure/di/tokens";
 
 const GITHUB_CLIENT_ID = envs.GITHUB_CLIENT_ID;
 const GITHUB_REDIRECT_URI = envs.GITHUB_REDIRECT_URI;
@@ -16,6 +17,7 @@ const MONDAY_CLIENT_ID = envs.MONDAY_CLIENT_ID;
 export class ImplementationsController {
     
     constructor(
+        @Inject(IMPLEMENTATION_REPOSITORY)
         private readonly implementationRepository: ImplementationRepository
     ) { }
     

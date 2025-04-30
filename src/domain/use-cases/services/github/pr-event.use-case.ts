@@ -4,6 +4,7 @@ import { PullRequestEventDto } from "../../../dtos/services/github";
 import { PullRequestEntity } from "../../../entities";
 import { ImplementationRepository, UserRepository } from "../../../repositories";
 import { CustomError } from "../../../errors/errors.custom";
+import { IMPLEMENTATION_DATASOURCE } from "../../../../infrastructure/di/tokens";
 
 
 
@@ -16,7 +17,7 @@ export class GithubPrEvent {
         @Inject('GITHUB_NOTIFICATIONS_SERVICE')
         private readonly ghNotificationsService: GithubNotificationsService,
 
-        @Inject('IMPLEMENTATION_DATASOURCE')
+        @Inject(IMPLEMENTATION_DATASOURCE)
         private readonly implementationsRepository: ImplementationRepository
     ) { 
         this.actionHandlers = {

@@ -1,10 +1,11 @@
-import { Controller, Post, Get, Param, Res, Req, Body } from "@nestjs/common";
+import { Controller, Post, Get, Param, Res, Req, Body, Inject } from "@nestjs/common";
 import { Request, Response } from "express";
 import { GithubGetPullRequest } from "../../../domain/use-cases/services";
 import { ImplementationRepository } from "../../../domain/repositories";
 import { GithubPrEvent } from "../../../domain/use-cases/services/github/pr-event.use-case";
 import { PullRequestEventDto } from "../../../domain/dtos/services/github/pull-request-event.dto";
 import { GithubGetPullRequestToReview } from "../../../domain/use-cases/services/github/get-prs-to-review.use-case";
+import { IMPLEMENTATION_REPOSITORY } from "../../../infrastructure/di/tokens";
 
 
 
@@ -14,7 +15,7 @@ import { GithubGetPullRequestToReview } from "../../../domain/use-cases/services
 export class ServicesController {
     
     constructor(
-        private readonly implemetationsRepository: ImplementationRepository,
+        @Inject(IMPLEMENTATION_REPOSITORY) private readonly implemetationsRepository: ImplementationRepository,
         private readonly ghPrEventUseCase: GithubPrEvent
     ) { }
     

@@ -1,29 +1,17 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ServicesController } from "./services.controller";
 import { AuthMiddleware } from "../../middlewares/auth.middleware";
-import { ImplementationRepository, UserRepository } from "../../../domain/repositories";
-import { MongoImplementationDataSourceImpl, MongoUserDataSourceImpls } from "../../../infrastructure/datasources";
-import { ImplementationRepositoryImpl } from "../../../infrastructure/repositories";
 import { GithubWebhookMiddleware } from "../../middlewares/gh-webhook.middleware";
 import { GithubPrEvent } from "../../../domain/use-cases/services/github/pr-event.use-case";
 import { GithubGateway } from "../gateways/gtihub/github.gateway";
+import { ImplementationProviders, UserProviders } from "../../../infrastructure/di/providers";
+import { IMPLEMENTATION_DATASOURCE } from "../../../infrastructure/di/tokens";
 
 @Module({
     controllers: [ServicesController],
     providers: [
-        {
-            provide: 'IMPLEMENTATION_DATASOURCE',
-            useFactory: () => new MongoImplementationDataSourceImpl()
-        },
-        {
-            provide: ImplementationRepository,
-            useFactory: (dataSource) => new ImplementationRepositoryImpl(dataSource),
-            inject: ['IMPLEMENTATION_DATASOURCE']
-        },
-        {
-            provide: UserRepository,
-            useClass: MongoUserDataSourceImpls
-        },
+        ...ImplementationProviders,
+        ...UserProviders,
         {
             provide: 'GITHUB_NOTIFICATIONS_SERVICE',
             useClass: GithubGateway
@@ -31,7 +19,7 @@ import { GithubGateway } from "../gateways/gtihub/github.gateway";
         {
             provide: GithubPrEvent,
             useFactory: (gateway, implRepo) => new GithubPrEvent(gateway, implRepo),
-            inject: ['GITHUB_NOTIFICATIONS_SERVICE', 'IMPLEMENTATION_DATASOURCE']
+            inject: ['GITHUB_NOTIFICATIONS_SERVICE', IMPLEMENTATION_DATASOURCE]
         },
         GithubWebhookMiddleware,
         AuthMiddleware
