@@ -6,12 +6,16 @@ import { GithubPrEvent } from "../../../domain/use-cases/services/github/pr-even
 import { GithubGateway } from "../gateways/gtihub/github.gateway";
 import { ImplementationProviders, UserProviders } from "../../../infrastructure/di/providers";
 import { IMPLEMENTATION_DATASOURCE } from "../../../infrastructure/di/tokens";
+import { MONDAY_API } from "../../../domain/services/moday-api.service";
+import { MondayAdapter } from "../../../config/monday";
+import { ServiceUseCasesProviders } from "../../../infrastructure/di/providers/services/use-cases.provider";
 
 @Module({
     controllers: [ServicesController],
     providers: [
         ...ImplementationProviders,
         ...UserProviders,
+        ...ServiceUseCasesProviders,
         {
             provide: 'GITHUB_NOTIFICATIONS_SERVICE',
             useClass: GithubGateway

@@ -7,4 +7,3 @@ export const USER_DATASOURCE = Symbol('USER_DATASOURCE');
 export const HASH_PASSWORD = Symbol('HASH_PASSWORD');
 export const COMPARE_PASSWORD = Symbol('COMPARE_PASSWORD');
 export const COMPARE_TOKEN = Symbol('COMPARE_TOKEN');
-

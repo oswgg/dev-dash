@@ -6,6 +6,7 @@ import { GithubPrEvent } from "../../../domain/use-cases/services/github/pr-even
 import { PullRequestEventDto } from "../../../domain/dtos/services/github/pull-request-event.dto";
 import { GithubGetPullRequestToReview } from "../../../domain/use-cases/services/github/get-prs-to-review.use-case";
 import { IMPLEMENTATION_REPOSITORY } from "../../../infrastructure/di/tokens";
+import { GetMondayDashboard } from "../../../domain/use-cases/services/monday/get-dashboard.use-case";
 
 
 
@@ -16,6 +17,7 @@ export class ServicesController {
     
     constructor(
         @Inject(IMPLEMENTATION_REPOSITORY) private readonly implemetationsRepository: ImplementationRepository,
+        @Inject(GetMondayDashboard) private readonly getMondayDashboard: GetMondayDashboard,
         private readonly ghPrEventUseCase: GithubPrEvent
     ) { }
     
@@ -70,4 +72,15 @@ export class ServicesController {
         }
     }
    
+    @Get('monday/dashboard')
+    async mondayDashboard(
+        @Res() res: Response,
+        @Req() req: Request
+    ): Promise<any> {
+        const user = req.user!;
+        
+        this.getMondayDashboard.execute(user.id)
+            .then(tasks => res.json(tasks))
+            .catch(error => res.status(400).json({ error: error.message }));
+    }
 }

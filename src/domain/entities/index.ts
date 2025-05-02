@@ -8,3 +8,6 @@ export * from "./implementation.entity";
 
 
 export * from "./pull-request.entity";
+
+
+export * from "./monday-task.entity";
