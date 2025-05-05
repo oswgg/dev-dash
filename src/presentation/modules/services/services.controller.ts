@@ -72,7 +72,7 @@ export class ServicesController {
         }
     }
    
-    @Get('monday/dashboard')
+    @Get('monday/tasks')
     async mondayDashboard(
         @Res() res: Response,
         @Req() req: Request

@@ -9,7 +9,10 @@ export class CustomError extends Error {
         this.statusCode = statusCode;
     }
     
-
+    static internal() {
+        return new CustomError(500, 'Internal server error');
+    }
+    
     static unauthorized(message: string) {
         return new CustomError(401, message);
     }

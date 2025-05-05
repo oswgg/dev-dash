@@ -1,9 +1,10 @@
-import { MondayTaskEntity } from "../domain/entities";
-import { MondayApi } from "../domain/services/moday-api.service";
-import { MondayTaskMapper } from "../infrastructure/mappers/monday-task.mapper";
-import { AxiosAdapter } from "./axios";
+import { Logger } from "@nestjs/common";
 import { envs } from "./envs";
-
+import { AxiosAdapter } from "./axios";
+import { MondayApi } from "../domain/services/moday-api.service";
+import { MondayUserEntity, MondayTaskEntity } from "../domain/entities/";
+import { MondayUserMapper, MondayTaskMapper } from "../infrastructure/mappers/";
+import { CustomError } from "../domain/errors/errors.custom";
 
 const MONDAY_CLIENT_ID = envs.MONDAY_CLIENT_ID;
 const MONDAY_CLIENT_SECRET = envs.MONDAY_CLIENT_SECRET;
@@ -51,36 +52,69 @@ export class MondayAdapter extends MondayApi {
     }
 
     private readonly client: AxiosAdapter;
+    private readonly logger: Logger;
     constructor(token: string) {
         super();
-        this.client = new AxiosAdapter(token);
+        this.client = new AxiosAdapter(MondayAdapter.base, token);
+        this.logger = new Logger('MONDAY_ADAPTER');
     }
 
     create(token: string) {
         return new MondayAdapter(token);
     }
+    
+    async getUserData(): Promise<MondayUserEntity> {
+        try {
+            const user = await this.client.post({
+                query: `
+                   query {
+                       me {
+                           id
+                           name
+                           photo_thumb
+                       }
+                   }
+                `
+            });
+            
 
-    async getDashboard(): Promise<MondayTaskEntity[]> {
+            return MondayUserMapper.fromApiCallToEntity(user.data);
+            
+        } catch (error: any) {
+            this.logger.error(error);
+            throw CustomError.internal();
+        }
+    }
+
+    async getUserTasks(): Promise<MondayTaskEntity[]> {
         try {
 
-            const a = await this.client.post(JSON.stringify({
+            const tasks = await this.client.post(JSON.stringify({
                 query: `
                     query {
                         boards {
                             id
                             name
+                            items_page (query_params: {rules: [{column_id: "person", compare_value: ["assigned_to_me"], operator: any_of}]}) {
+                                items {
+                                    id
+                                    name
+                                    column_values(ids: ["status"]) {
+                                        text
+                                    }
+                                }
+                            }
                         }
                     }
-                `
+                    `
                 })
             );
-
             
-            return a.data.map(MondayTaskMapper.fromObjectToEntity);
+            return MondayTaskMapper.fromApiCallToEntity(tasks.data);
 
         } catch (error: any) {
-
-            return [];
+            this.logger.error(error);
+            throw CustomError.internal();
         }
 
     }

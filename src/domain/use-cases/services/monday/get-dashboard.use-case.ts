@@ -3,6 +3,8 @@ import { IMPLEMENTATION_REPOSITORY } from "../../../../infrastructure/di/tokens"
 import { ImplementationRepository } from "../../../repositories";
 import { MONDAY_API, MondayApi } from "../../../services/moday-api.service";
 import { MondayTaskEntity } from "../../../entities";
+import { CustomError } from "../../../errors/errors.custom";
+import { MondayUserEntity } from "../../../entities/monday-user.entity";
 
 
 
@@ -13,15 +15,19 @@ export class GetMondayDashboard {
         @Inject(MONDAY_API) private readonly mondayApiFactory: MondayApi
     ) { }
     
-    async execute(userId: any): Promise<MondayTaskEntity[]> {
+    async execute(userId: any): Promise<{user: MondayUserEntity, tasks:MondayTaskEntity[]}> {
         const implementation = await this.implementationRepository.getOne({ userId, service: 'monday' });
         
-        if (!implementation) throw new Error('User has no monday implementation');
+        if (!implementation) throw CustomError.forbidden('User has no monday implementation');
 
-       const apiMonday = this.mondayApiFactory.create(implementation.accessToken);
+        const mondayApi = this.mondayApiFactory.create(implementation.accessToken);
        
+        const tasks = await mondayApi.getUserTasks();
+        const user = await mondayApi.getUserData();
 
-        
-        return await apiMonday.getDashboard();
+        return {
+            user,
+            tasks
+        }
     }
 }

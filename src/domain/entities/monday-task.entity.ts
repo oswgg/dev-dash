@@ -1,9 +1,10 @@
 
 
 
-
-
 export class MondayTaskEntity {
-    constructor() { }
-
+    constructor(
+        public board: string,
+        public name: string,
+        public status: string
+    ) { }
 }

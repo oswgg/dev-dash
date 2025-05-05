@@ -11,3 +11,5 @@ export * from "./pull-request.entity";
 
 
 export * from "./monday-task.entity";
+
+export * from "./monday-user.entity";
