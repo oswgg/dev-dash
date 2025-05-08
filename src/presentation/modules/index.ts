@@ -1,8 +1,8 @@
 import { ImplementationsModule } from "./implementations/module";
 import { ServicesModule } from "./services/module";
-import { UserModule } from "./user/module";
+import { AuthModule } from "./auth/module";
 
 // Gateways
 import { GithubGatewayModule } from "./gateways";
 
-export const modules = [UserModule, ImplementationsModule, ServicesModule, GithubGatewayModule];
+export const modules = [AuthModule, ImplementationsModule, ServicesModule, GithubGatewayModule];

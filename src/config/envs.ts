@@ -12,4 +12,7 @@ export const envs = {
     GITHUB_REDIRECT_URI: get('GITHUB_REDIRECT_URI').required().asString(),
     MONDAY_CLIENT_ID: get('MONDAY_CLIENT_ID').required().asString(),
     MONDAY_CLIENT_SECRET: get('MONDAY_CLIENT_SECRET').required().asString(),
+    GCP_CLIENT_ID: get('GCP_CLIENT_ID').required().asString(),
+    GCP_CLIENT_SECRET: get('GCP_CLIENT_SECRET').required().asString(),
+    GCP_REDIRECT_URI: get('GCP_REDIRECT_URI').required().asString(),
 }

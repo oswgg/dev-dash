@@ -1,18 +1,24 @@
-import { JwtAdapter, SignTokenFunction } from "../../../config/jwt";
+import { Inject } from "@nestjs/common";
+import { SignTokenFunction } from "../../../config/jwt";
 import { UserMapper } from "../../../infrastructure/mappers";
 import { RegisterUserDto } from "../../dtos/user";
 import { UserEntity } from "../../entities/user.entity";
 import { UserRepository } from "../../repositories";
+import { SIGN_TOKEN, USER_REPOSITORY } from "../../../infrastructure/di/tokens";
 
 type UserTokenResponse = {
     token: string;
     user: Omit<UserEntity, 'password'>;
 }
 
+export const REGISTER_USER = Symbol('REGISTER_USER');
+
 export class RegisterUser {
     constructor(
+        @Inject(USER_REPOSITORY)
         private readonly userRepository: UserRepository,
-        private readonly signToken: SignTokenFunction = JwtAdapter.sign
+        @Inject(SIGN_TOKEN)
+        private readonly signToken: SignTokenFunction
     ) { }
     
     async execute(registerUserDto: RegisterUserDto): Promise<UserTokenResponse> {

@@ -8,7 +8,7 @@ export class AxiosAdapter {
 
     constructor(
         url: string,
-        token: string
+        token?: string
     ) {
         this.client = axios.create({
             baseURL: url,
@@ -22,9 +22,6 @@ export class AxiosAdapter {
             return Promise.resolve(response.data);
 
         }, (error: any) => {
-            console.log(error)
-            console.log(error.response.data.errors)
-
             return Promise.reject({ status: error.status, message: error.response.statusText });
         });
     }

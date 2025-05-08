@@ -20,15 +20,20 @@ export class MongoUserDataSourceImpls implements UserDataSource {
 
     async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
         try {
-            const { name, email, password } = registerUserDto;
+            const { name, email, password, fromOAuth } = registerUserDto;
+            
+            console.log(registerUserDto);
         
             const existsEmail = await UserModel.findOne({ email });
             if (existsEmail) throw new Error('Email already exists');
             
+            const hashedpassword = fromOAuth ? null : await this.hashPassword(password!);
+            
             const user = await UserModel.create({
                 name,
                 email,
-                password: await this.hashPassword(password)
+                fromOAuth,
+                password: hashedpassword
             });
             
             const userEntity = UserMapper.fromObjectToEntity(user);
@@ -45,7 +50,7 @@ export class MongoUserDataSourceImpls implements UserDataSource {
             const user = await UserModel.findOne({ email });
             if (!user) throw new Error('Invalid credentials');
             
-            const isPasswordCorrect = await this.comparePassword(password, user.password);
+            const isPasswordCorrect = await this.comparePassword(password, user.password!);
             if (!isPasswordCorrect) throw new Error('Invalid credentials');
             
             return UserMapper.fromObjectToEntity(user);
