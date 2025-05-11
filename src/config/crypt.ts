@@ -18,4 +18,8 @@ export class CryptoAdapter {
         );
         
     }
+    
+    static createRandomString(length: number, charset: 'hex' | 'base64' | 'binary' | 'ascii' = 'hex'): string {
+        return crypto.randomBytes(length).toString(charset);
+    }
 }

@@ -22,8 +22,6 @@ export class MongoUserDataSourceImpls implements UserDataSource {
         try {
             const { name, email, password, fromOAuth } = registerUserDto;
             
-            console.log(registerUserDto);
-        
             const existsEmail = await UserModel.findOne({ email });
             if (existsEmail) throw new Error('Email already exists');
             

@@ -37,7 +37,7 @@ export class AuthMiddleware implements NestMiddleware {
         if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
             return authHeader.split(' ')[1];
         }
-
+        
         const tokenFromQuery = req.query.token as string | undefined;
         if (tokenFromQuery) {
             return tokenFromQuery;

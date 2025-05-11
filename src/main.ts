@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app";
 import { MongoDatabase } from "./data/mongoose/mongo-database";
 import { envs } from "./config/envs";
+import session from "express-session";
 
 async function bootstrap() {
     await MongoDatabase.connect({
@@ -12,8 +13,18 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     app.setGlobalPrefix('api');
     app.enableCors({
-        origin: '*'
+        origin: 'http://localhost:5173',
+        credentials: true
     });
+    app.use(session({
+        secret: envs.SESSIONS_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 60000,
+            httpOnly: true
+        }
+    }));
     await app.listen(3000);
 }
 bootstrap();
