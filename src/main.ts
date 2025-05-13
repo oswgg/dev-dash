@@ -3,6 +3,8 @@ import { AppModule } from "./app";
 import { MongoDatabase } from "./data/mongoose/mongo-database";
 import { envs } from "./config/envs";
 import session from "express-session";
+import { HttpExceptionMiddleware } from "./presentation/middlewares/http-exceptions.middleware";
+import { CatchEveryExceptionMiddleware } from "./presentation/middlewares/catch-every-exception.middleware";
 
 async function bootstrap() {
     await MongoDatabase.connect({
@@ -25,6 +27,7 @@ async function bootstrap() {
             httpOnly: true
         }
     }));
+    app.useGlobalFilters(new CatchEveryExceptionMiddleware(), new HttpExceptionMiddleware());
     await app.listen(3000);
 }
 bootstrap();

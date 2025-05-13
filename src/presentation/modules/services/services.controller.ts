@@ -7,6 +7,7 @@ import { PullRequestEventDto } from "../../../domain/dtos/services/github/pull-r
 import { GithubGetPullRequestToReview } from "../../../domain/use-cases/services/github/get-prs-to-review.use-case";
 import { IMPLEMENTATION_REPOSITORY } from "../../../infrastructure/di/tokens";
 import { GetMondayDashboard } from "../../../domain/use-cases/services/monday/get-dashboard.use-case";
+import { BadRequestException } from "../../../domain/errors/errors.custom";
 
 
 
@@ -24,63 +25,40 @@ export class ServicesController {
     @Get('github/pull-requests')
     async getNotifications(
         @Req() req: Request,
-        @Res() res: Response): Promise<any> {
-
-        new GithubGetPullRequest(this.implemetationsRepository).execute(req.user!.id)
-            .then(prs => {
-                res.json(prs);
-            })
-            .catch(error => {
-                res.status(400).json({ error: error.message });
-            });
+       ): Promise<any> {
+        return await new GithubGetPullRequest(this.implemetationsRepository).execute(req.user!.id);
     }
     
     @Get('github/pull-requests/to-review') 
     async getPullrequestsToReview(
         @Req() req: Request,
-        @Res() res: Response
     ): Promise<any> {
-        
-        new GithubGetPullRequestToReview(this.implemetationsRepository).execute(req.user!.id)
-            .then(prs => {
-                res.json(prs);
-            })
-            .catch(error => {
-                res.status(400).json({ error: error.message });
-            });
+        return await new GithubGetPullRequestToReview(this.implemetationsRepository).execute(req.user!.id);
     }
     
     @Post('github/events')
     async githubEventHandler(
         @Req() req: Request,
+        @Res() res: Response,
         @Body() body: any,
-        @Res() res: Response): Promise<any> {
+    ): Promise<any> {
             
         const event = req.headers['x-github-event'] as string;
         
         if (event === 'pull_request') { 
             const { action, pull_request, sender } = body;
-            const ghPullRequestEventDto = PullRequestEventDto.create(action, pull_request);
+            const [ errors, ghPullRequestEventDto ] = PullRequestEventDto.create(action, pull_request);
             
-            this.ghPrEventUseCase.execute(ghPullRequestEventDto, sender)
-                .then(() => { 
-                    res.status(200).json({ message: 'ok' }); 
-                })
-                .catch(error => { 
-                    res.status(400).json({ error: error.message }); 
-                });
+            if (errors) throw new BadRequestException('Invalid Body', 'Some fields are invalid', errors);
+            
+            return await this.ghPrEventUseCase.execute(ghPullRequestEventDto!, sender);
         }
     }
    
     @Get('monday/tasks')
     async mondayDashboard(
-        @Res() res: Response,
         @Req() req: Request
     ): Promise<any> {
-        const user = req.user!;
-        
-        this.getMondayDashboard.execute(user.id)
-            .then(tasks => res.json(tasks))
-            .catch(error => res.status(400).json({ error: error.message }));
+        return await this.getMondayDashboard.execute(req.user!.id);
     }
 }

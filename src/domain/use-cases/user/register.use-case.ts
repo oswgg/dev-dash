@@ -26,7 +26,7 @@ export class RegisterUser {
         
         const token = await this.signToken({ id: user.id });
         
-        if (!token) throw new Error('Token is not generated');
+        if (!token) throw new Error('Token was not generated');
         
         const userTokenResponse: UserTokenResponse = {
             token: token,

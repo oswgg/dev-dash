@@ -3,10 +3,11 @@ import { BcryptAdapter, comparePasswordFunction, hashPasswordFunction } from "..
 import { CompareTokenFunction, JwtAdapter } from "../../config/jwt";
 import { UserModel } from "../../data/mongoose/models";
 import { UserDataSource } from "../../domain/datasources";
-import { AuthenticateUserDto, LoginUserDto, RegisterUserDto } from "../../domain/dtos/user";
+import { LoginUserDto, RegisterUserDto } from "../../domain/dtos/user";
 import { UserEntity } from "../../domain/entities";
 import { UserMapper } from "../mappers";
 import { COMPARE_PASSWORD, COMPARE_TOKEN, HASH_PASSWORD } from "../di/tokens";
+import { DuplicatedException, ForbiddenException, NotFoundException } from "../../domain/errors/errors.custom";
 
 
 
@@ -23,7 +24,7 @@ export class MongoUserDataSourceImpls implements UserDataSource {
             const { name, email, password, fromOAuth } = registerUserDto;
             
             const existsEmail = await UserModel.findOne({ email });
-            if (existsEmail) throw new Error('Email already exists');
+            if (existsEmail) throw new DuplicatedException('Duplicated', 'Email already exists', { email });
             
             const hashedpassword = fromOAuth ? null : await this.hashPassword(password!);
             
@@ -46,10 +47,10 @@ export class MongoUserDataSourceImpls implements UserDataSource {
         const { email, password } = loginUserDto;
         try {
             const user = await UserModel.findOne({ email });
-            if (!user) throw new Error('Invalid credentials');
+            if (!user) throw new ForbiddenException('Invalid Credentials', 'User or password are invalid', { sent: { email, password } });
             
             const isPasswordCorrect = await this.comparePassword(password, user.password!);
-            if (!isPasswordCorrect) throw new Error('Invalid credentials');
+            if (!isPasswordCorrect) throw new ForbiddenException('Invalid Credentials', 'User or password are invalid', { sent: { email, password } });
             
             return UserMapper.fromObjectToEntity(user);
             
@@ -62,7 +63,7 @@ export class MongoUserDataSourceImpls implements UserDataSource {
         try {
             
             const user = await UserModel.findOne({ _id: userID });
-            if (!user) throw new Error('User not found');
+            if (!user) throw new NotFoundException('Not Found', `Token's user was not found`);
             
             const userEntity = UserMapper.fromObjectToEntity(user);
             

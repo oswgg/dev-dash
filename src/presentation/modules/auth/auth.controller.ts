@@ -1,6 +1,5 @@
 import { Controller, Post, Body, Res, Inject, Get, Req } from "@nestjs/common";
-import { Response, Request } from "express";
-import * as session from "express-session";
+import { Response } from "express";
 import { LoginUserDto, RegisterUserDto } from "../../../domain/dtos/user"
 import { REGISTER_USER, RegisterUser } from "../../../domain/use-cases/user";
 import { UserRepository } from "../../../domain/repositories";
@@ -9,8 +8,7 @@ import { USER_REPOSITORY } from "../../../infrastructure/di/tokens";
 import { IGcpAdpater } from "../../../config/googleapi";
 import { CryptoAdapter } from "../../../config/crypt";
 import { RequestWithSession } from "../../../types/express";
-import * as querystring from "querystring"
-import * as url from "url";
+import { BadRequestException, UnauthorizedException } from "../../../domain/errors/errors.custom";
 
 
 @Controller('auth')
@@ -22,23 +20,16 @@ export class AuthController {
         private readonly gcpAdapter: IGcpAdpater
     ) { }
 
-    handleError(error: Error, res: Response) {
-        res.status(400).json({ error: error.message });
-    }
-
     @Post('register')
     async register(
-        @Res() res: Response,
         @Body() body: any
     ): Promise<any> {
-        if (!body) return res.status(400).json({ error: 'Body is missing' });
+        if (!body) throw new BadRequestException('Invalid Body', 'Body is missing');
 
-        const [error, user] = RegisterUserDto.create(body);
-        if (error) return res.status(400).json({ error });
+        const [errors, user] = RegisterUserDto.create(body);
+        if (errors) throw new BadRequestException('Invalid Body', 'Some fields are invalid', errors);
 
-        this.registerUser.execute(user!)
-            .then(user => res.status(201).json(user))
-            .catch(error => this.handleError(error, res));
+        return await this.registerUser.execute(user!);
     }
 
 
@@ -47,14 +38,12 @@ export class AuthController {
         @Res() res: Response,
         @Body() body: any
     ): Promise<any> {
-        if (!body) return res.status(400).json({ error: 'Body is missing' });
+        if (!body) throw new BadRequestException('Invalid Body', 'Body is missing');
 
-        const [error, user] = LoginUserDto.create(body);
-        if (error) return res.status(400).json({ error });
-
-        new LoginUser(this.userRepository).execute(user!)
-            .then(user => res.status(200).json(user))
-            .catch(error => this.handleError(error, res));
+        const [errors, user] = LoginUserDto.create(body);
+        if (errors) throw new BadRequestException('Invalid Body', 'Some fields are invalid', errors);
+        
+        return await new LoginUser(this.userRepository).execute(user!)
     }
 
     @Get('oauth/google')
@@ -89,7 +78,6 @@ export class AuthController {
     @Post('oauth/google/callback')
     async googleOAuthCallback(
         @Req() req: RequestWithSession,
-        @Res() res: Response
     ): Promise<any> {
         const { code, state } = req.body;
         const helperurl = new URL(`http://a.com?${state}`); 
@@ -98,18 +86,18 @@ export class AuthController {
         const stateSession = query.get('sessionId');
         
         if (!req.session.oauthState)
-            return res.status(400).json({ error: 'No session id was found' });
+            throw new UnauthorizedException('Missing Session', 'No session id was found');
         
         const { sessionId, timestamp, used } = req.session.oauthState;
         
         if (stateSession !== sessionId) 
-            return res.status(400).json({ error: 'Invalid session id' });
+            throw new UnauthorizedException('Invalid Session', 'Invalid session');
 
         if (Date.now() - timestamp > 60000)
-            return res.status(400).json({ error: 'Session expired' });
+            throw new UnauthorizedException('Invalid Session', 'Session expired');
 
         if (used)
-            return res.status(400).json({ error: 'Session already used' });
+            throw new UnauthorizedException('Invalid Session', 'Session already used');
 
         req.session.oauthState.used = true;
         await new Promise<void>((resolve, reject) => {
@@ -119,28 +107,22 @@ export class AuthController {
             })
         });
         
-        if (!code) return res.status(400).json({ error: 'Code is missing' });
-        
-        try {
-            await this.gcpAdapter.setCredentialsByCode(code)
-            
-            const userDataFromGCP = await this.gcpAdapter.getUserData();
-            
-            const [error, registerUserDto] = RegisterUserDto.create({
-                name: userDataFromGCP.given_name,
-                email: userDataFromGCP.email,
-                password:  null,
-                fromOAuth: true
-            });
-            
-            if (error) return res.status(400).json({ error });
-            
-            const user = await this.registerUser.execute(registerUserDto!)
-                .then(user => res.status(201).json(user))
-                .catch(error => this.handleError(error, res));
+        if (!code)  
+            throw new BadRequestException('Bad Request', 'Code is missing');
 
-        } catch (error: any) {
-            return res.status(400).json({ error: error.message });
-        }
+        await this.gcpAdapter.setCredentialsByCode(code)
+        
+        const userDataFromGCP = await this.gcpAdapter.getUserData();
+        
+        const [errors, registerUserDto] = RegisterUserDto.create({
+            name: userDataFromGCP.given_name,
+            email: userDataFromGCP.email,
+            password:  null,
+            fromOAuth: true
+        });
+        
+        if (errors) throw new BadRequestException('Invalid Body', 'Some fields are invalid', errors);
+        
+        return await this.registerUser.execute(registerUserDto!);
     }
 }

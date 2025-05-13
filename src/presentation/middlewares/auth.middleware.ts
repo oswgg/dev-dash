@@ -1,9 +1,10 @@
-import { Inject, Injectable, NestMiddleware } from "@nestjs/common";
+import { Inject, Injectable, NestMiddleware, UseFilters } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { AuthUser } from "../../domain/use-cases/user/auth-user.use-case";
 import { UserRepository } from "../../domain/repositories";
 import { UserMapper } from "../../infrastructure/mappers";
 import { USER_REPOSITORY } from "../../infrastructure/di/tokens";
+import { UnauthorizedException } from "../../domain/errors/errors.custom";
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -13,22 +14,15 @@ export class AuthMiddleware implements NestMiddleware {
     ) {}
 
     async use(req: Request, res: Response, next: NextFunction) {
-        try {
             const token = this.extractToken(req);
             
             if (!token) {
-                return res.status(401).json({ error: 'Authentication token required' });
+                throw new UnauthorizedException('Missing Token', 'Token is required for authentication');
             }
-
-            const user = await new AuthUser(this.userRepository).execute({ token });
+            
+            const user = await new AuthUser(this.userRepository).execute(token);
             req.user = UserMapper.noPassword(user);
             next();
-        } catch (error) {
-            return res.status(401).json({ 
-                error: 'Authentication failed',
-                details: error instanceof Error ? error.message : 'Unknown error'
-            });
-        }
     }
 
     private extractToken(req: Request): string | null {

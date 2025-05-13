@@ -1,31 +1,59 @@
-
-
-
-export class CustomError extends Error {
-    public statusCode: number;
-
-    constructor(statusCode: number, message: string) {
-        super(message);
-        this.statusCode = statusCode;
+export interface IErrorDescription {
+    message?: string;
+    sent?: {
+        [key: string]: any;
     }
-    
-    static internal() {
-        return new CustomError(500, 'Internal server error');
-    }
-    
-    static unauthorized(message: string) {
-        return new CustomError(401, message);
-    }
+}
 
-    static forbidden(message: string) {
-        return new CustomError(403, message);
-    }
+export type errorMessage = 
+'Invalid Body' |
+'Missing Token' |
+'Invalid Token' |
+'Invalid Credentials' |
+'Internal Server Error' | 
+'Missing Session' |
+'Invalid Session' |
+'Not Found' |
+'Duplicated' |
+'Forbidden' |
+'Unauthorized' |
+'Bad Request';
 
-    static notFound(message: string) {
-        return new CustomError(404, message);
-    }
+export class CustomException {
+    constructor(
+        public message: errorMessage, 
+        public statusCode: number,  
+        public description: string | null = null, 
+        public errors?: IErrorDescription[] | IErrorDescription
+    ) { }
+}
 
-    static badRequest(message: string) {
-        return new CustomError(400, message);
+export class UnauthorizedException extends CustomException {
+    constructor(message: errorMessage, description?: string, errors?: IErrorDescription[] | IErrorDescription) {
+        super(message, 401, description, errors);
+    }
+}
+
+export class BadRequestException extends CustomException {
+    constructor(message: errorMessage, description?: string, errors?: IErrorDescription[]) {
+        super(message, 400, description, errors);
+    }
+}
+
+export class ForbiddenException extends CustomException {
+    constructor(message: errorMessage, description?: string, errors?: IErrorDescription[] | IErrorDescription) {
+        super(message, 403, description, errors);
+    }
+}
+
+export class NotFoundException extends CustomException {
+    constructor(message: errorMessage, description?: string, errors?: IErrorDescription[] | IErrorDescription) {
+        super(message, 404, description, errors);
+    }
+}
+
+export class DuplicatedException extends CustomException {
+    constructor(message: errorMessage, description?: string, sent: { [key: string]: any } = {}) {
+        super(message, 409, description, { sent });
     }
 }

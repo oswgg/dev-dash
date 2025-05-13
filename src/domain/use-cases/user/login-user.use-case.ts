@@ -22,7 +22,7 @@ export class LoginUser {
         const user = await this.userRepository.login(loginUserDto);
         
         const token = await this.signToken({ id: user.id });
-        if (!token) throw new Error('Token is not generated');
+        if (!token) throw new Error('Token was not generated');
         
  
         const userTokenResponse: UserTokenResponse = {

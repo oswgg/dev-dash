@@ -7,6 +7,7 @@ import { ImplementationService } from "../../../data/mongoose/models";
 import { CreateMondayImplementationDto } from "../../../domain/dtos/implementation/create-monday-implementation.dto";
 import { ActivateMonday } from "../../../domain/use-cases/implementation/monday/monday-activate.use-case";
 import { IMPLEMENTATION_REPOSITORY } from "../../../infrastructure/di/tokens";
+import { BadRequestException } from "../../../domain/errors/errors.custom";
 
 const GITHUB_CLIENT_ID = envs.GITHUB_CLIENT_ID;
 const GITHUB_REDIRECT_URI = envs.GITHUB_REDIRECT_URI;
@@ -23,13 +24,12 @@ export class ImplementationsController {
     
     @Get()
     async getActiveImplementations(
-        @Res() res: Response,
         @Req() req: Request
     ): Promise<any> {
         const user = req.user!;
-        new GetActiveImplementations(this.implementationRepository).execute(user.id)
-            .then(implementations => res.json(implementations))
-            .catch(error => res.status(500).json({ error: error.message }));
+        
+        return await new GetActiveImplementations(this.implementationRepository).execute(user.id);
+        
     }
     
     @Get(':implementation')
@@ -39,15 +39,11 @@ export class ImplementationsController {
         @Req() req: Request
     ): Promise<any> {
         const user = req.user!;
-        new GetActiveImplementations(this.implementationRepository).execute(user.id, implementation)
-            .then(implementation =>  {
-                if (implementation) {
-                    return res.status(200).json({ active: true });
-                }
-                
-                res.status(200).json({ active: false });
-            })
-            .catch(error => res.status(500).json({ error: error.message }));
+        
+        const activeImpl = await new GetActiveImplementations(this.implementationRepository).execute(user.id, implementation);
+        
+        if (activeImpl) res.json({ active: true });
+        else res.json({ active: false });
     }
 
     @Get('github/activate')
@@ -71,8 +67,8 @@ export class ImplementationsController {
         const decodedState = decodeURIComponent(state as string);
         const { returnTo } = JSON.parse(decodedState);
     
-        if (!code) return res.status(400).json({ error: 'Code is missing' });
-    
+        if (!code)  throw new BadRequestException('Bad Request', 'Code is missing');
+
         const user = req.user!;
         const redirectUrl = returnTo;
     
@@ -113,13 +109,13 @@ export class ImplementationsController {
         const decodedState = decodeURIComponent(state as string);
         const { returnTo } = JSON.parse(decodedState);
         
-        if (!code) return res.status(400).json({ error: 'Code is missing' });
+        if (!code) throw new BadRequestException('Bad Request', 'Code is missing');
         
         const user = req.user!;
         
         try {
-            const [error, activateMondayDTO] = CreateMondayImplementationDto.create({ code: code as string, userId: user.id });
-            if (error) return res.status(400).json({ error: error });
+            const [errors, activateMondayDTO] = CreateMondayImplementationDto.create({ code: code as string, userId: user.id });
+            if (errors) throw new BadRequestException('Invalid Body', 'Some fields are invalid', errors);
             
             const implementation = await new ActivateMonday(this.implementationRepository).execute(activateMondayDTO!);
             

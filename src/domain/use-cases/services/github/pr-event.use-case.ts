@@ -3,7 +3,7 @@ import { GithubNotificationsService } from "../../../services";
 import { PullRequestEventDto } from "../../../dtos/services/github";
 import { PullRequestEntity } from "../../../entities";
 import { ImplementationRepository, UserRepository } from "../../../repositories";
-import { CustomError } from "../../../errors/errors.custom";
+import { ForbiddenException } from "../../../errors/errors.custom";
 import { IMPLEMENTATION_DATASOURCE } from "../../../../infrastructure/di/tokens";
 
 
@@ -34,7 +34,7 @@ export class GithubPrEvent {
             username: sender.login
         });
         
-        if (!implementation) throw CustomError.forbidden('Sender is not registered');
+        if (!implementation) throw new ForbiddenException('Forbidden', 'Sender is not registered');
         
         const { userId } = implementation;
         
