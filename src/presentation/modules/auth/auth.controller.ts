@@ -35,7 +35,6 @@ export class AuthController {
 
     @Post('login')
     async login(
-        @Res() res: Response,
         @Body() body: any
     ): Promise<any> {
         if (!body) throw new BadRequestException('Invalid Body', 'Body is missing');

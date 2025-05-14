@@ -4,6 +4,7 @@ import { PullRequestEntity } from '../domain/entities';
 import { Logger } from '@nestjs/common';
 import { ImplementationRepository } from '../domain/repositories';
 import { RenewGithubToken } from '../domain/use-cases/implementation';
+import { ForbiddenException, InternalServerException } from '../domain/errors/errors.custom';
 
 export interface IOctokitAdapter {
     getPullRequests(
@@ -46,8 +47,8 @@ export async function getOctokitAdapter(): Promise<OctokitAdapterConstructor> {
                     const impl = await renewTokenUseCase.execute(this.userId);
                     
                     if (!impl) {
-                        this.logger.error('Failed to renew github token');
-                        throw new Error('Internal Server Error');
+                        this.logger.error('Failed to renew github token', error);
+                        throw new ForbiddenException('Forbidden', 'Error renewing github token. Please contact the administrator');
                     }
 
                     this.client = new Octokit({
@@ -58,7 +59,7 @@ export async function getOctokitAdapter(): Promise<OctokitAdapterConstructor> {
                     return this.getPullRequests(config, implementationRepository);
                 }
                 
-                this.logger.error(error);
+                this.logger.error('Error getting pull requests', error);
                 return null;
             }
         }

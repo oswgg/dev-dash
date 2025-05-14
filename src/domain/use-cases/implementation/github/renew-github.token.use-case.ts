@@ -1,7 +1,7 @@
 import { GithubAdapter } from "../../../../config/github";
 import { ImplementationEntity } from "../../../entities";
 import { ImplementationRepository } from "../../../repositories";
-import { ForbiddenException } from "../../../errors/errors.custom";
+import { ForbiddenException, NotFoundException } from "../../../errors/errors.custom";
 
 
 
@@ -29,7 +29,7 @@ export class RenewGithubToken {
             }
         });
         
-        if (!implementation) throw new Error('Implementation not found');
+        if (!implementation) throw new NotFoundException('Not Found', 'Implementation not found');
 
         if (implementation.accessToken === ghImplementation.accessToken  // Tokens are the same
         && implementation.refreshToken === ghImplementation.refreshToken) return null;

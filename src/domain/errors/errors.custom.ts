@@ -19,13 +19,15 @@ export type errorMessage =
 'Unauthorized' |
 'Bad Request';
 
-export class CustomException {
+export class CustomException extends Error {
     constructor(
         public message: errorMessage, 
         public statusCode: number,  
         public description: string | null = null, 
         public errors?: IErrorDescription[] | IErrorDescription
-    ) { }
+    ) { 
+        super(message);
+    }
 }
 
 export class UnauthorizedException extends CustomException {
@@ -55,5 +57,11 @@ export class NotFoundException extends CustomException {
 export class DuplicatedException extends CustomException {
     constructor(message: errorMessage, description?: string, sent: { [key: string]: any } = {}) {
         super(message, 409, description, { sent });
+    }
+}
+
+export class InternalServerException extends CustomException {
+    constructor(description: string) {
+        super('Internal Server Error', 500, description);
     }
 }

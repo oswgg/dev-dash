@@ -2,6 +2,7 @@ import { JwtAdapter, SignTokenFunction } from "../../../config/jwt";
 import { UserMapper } from "../../../infrastructure/mappers";
 import { LoginUserDto } from "../../dtos/user";
 import { UserEntity } from "../../entities";
+import { InternalServerException } from "../../errors/errors.custom";
 import { UserRepository } from "../../repositories";
 
 
@@ -22,7 +23,7 @@ export class LoginUser {
         const user = await this.userRepository.login(loginUserDto);
         
         const token = await this.signToken({ id: user.id });
-        if (!token) throw new Error('Token was not generated');
+        if (!token) throw new InternalServerException('Token was not generated');
         
  
         const userTokenResponse: UserTokenResponse = {
