@@ -1,5 +1,6 @@
 import { PullRequestMapper } from "../../../../infrastructure/mappers";
 import { PullRequestEntity } from "../../../entities";
+import { IErrorDescription } from "../../../errors/errors.custom";
 
 
 
@@ -10,7 +11,20 @@ export class PullRequestEventDto {
         public pullRequest: PullRequestEntity
     ) { }
     
-    static create(action: string, pullRequest: any): PullRequestEventDto {
-        return new PullRequestEventDto(action, PullRequestMapper.fromObjectToEntity(pullRequest));
+    static create(action: string, pullRequest: any): [IErrorDescription[]?, PullRequestEventDto?] {
+        const errors: IErrorDescription[] = [];
+
+        if (!action)      errors.push({ message: 'Action is missing '});
+        if (!pullRequest) errors.push({ message: 'Pull request is missing '});
+        
+        if (errors.length > 0) return [ errors, undefined ];
+        
+        return [
+            undefined,
+            new PullRequestEventDto(
+                action,
+                pullRequest
+            )
+        ]
     }
 }

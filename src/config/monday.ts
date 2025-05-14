@@ -4,7 +4,6 @@ import { AxiosAdapter } from "./axios";
 import { MondayApi } from "../domain/services/moday-api.service";
 import { MondayUserEntity, MondayTaskEntity } from "../domain/entities/";
 import { MondayUserMapper, MondayTaskMapper } from "../infrastructure/mappers/";
-import { CustomError } from "../domain/errors/errors.custom";
 
 const MONDAY_CLIENT_ID = envs.MONDAY_CLIENT_ID;
 const MONDAY_CLIENT_SECRET = envs.MONDAY_CLIENT_SECRET;
@@ -82,7 +81,7 @@ export class MondayAdapter extends MondayApi {
             
         } catch (error: any) {
             this.logger.error(error);
-            throw CustomError.internal();
+            throw error;
         }
     }
 
@@ -114,7 +113,7 @@ export class MondayAdapter extends MondayApi {
 
         } catch (error: any) {
             this.logger.error(error);
-            throw CustomError.internal();
+            throw error;
         }
 
     }

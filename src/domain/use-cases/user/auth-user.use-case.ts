@@ -1,6 +1,6 @@
 import { CompareTokenFunction, JwtAdapter } from "../../../config/jwt";
-import { AuthenticateUserDto } from "../../dtos/user";
 import { UserEntity } from "../../entities";
+import { UnauthorizedException } from "../../errors/errors.custom";
 import { UserRepository } from "../../repositories";
 
 
@@ -12,11 +12,11 @@ export class AuthUser {
         private readonly compareToken: CompareTokenFunction = JwtAdapter.compare
     ) { }
     
-    async execute(authenticateUserDto: AuthenticateUserDto): Promise<UserEntity> {
-        const decoded: { id: string } = await this.compareToken(authenticateUserDto.token);
+    async execute(token: string): Promise<UserEntity> {
+        const decoded: { id: string } = await this.compareToken(token);
         
-        if (!decoded) throw new Error('Token is invalid');
-        if (!decoded.id) throw new Error('Token is invalid');
+        if (!decoded) throw new UnauthorizedException('Invalid Token', 'Token is invalid');
+        if (!decoded.id) throw new UnauthorizedException('Invalid Token', 'Token is invalid');
         
         return this.userRepository.authenticate(decoded.id);
     }

@@ -1,16 +1,17 @@
 import { UserEntity } from "../../domain/entities/user.entity";
+import { InternalServerException } from "../../domain/errors/errors.custom";
 
 
 
 export class UserMapper {
 
     static fromObjectToEntity(object: { [key: string]: any }): UserEntity {
-        const { id, _id, name, email, password, fromOAuth } = object;
+        let { id, _id, name, email, password, fromOAuth } = object;
         
-        if (!id && !_id) throw new Error('User id is missing');
-        if (!name) throw new Error('User name is missing');
-        if (!email) throw new Error('User email is missing');
-        if (!fromOAuth && !password) throw new Error('User password is missing');
+        if (!id && !_id)             throw new InternalServerException('User id is missing');
+        if (!name)                   throw new InternalServerException('User name is missing');
+        if (!email)                  throw new InternalServerException('User email is missing');
+        if (!fromOAuth && !password) throw new InternalServerException('User password is missing');
 
         return new UserEntity(
             _id || id,

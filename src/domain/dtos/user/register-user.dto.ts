@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Validators } from "../../../config/validators"
+import { IErrorDescription } from "../../errors/errors.custom";
 
 
 @Injectable()
@@ -11,17 +12,20 @@ export class RegisterUserDto {
         public fromOAuth: boolean = false,
     ) {}
 
-    static create(body: { [key: string]: any }): [string?, RegisterUserDto?] {
+    static create(body: { [key: string]: any }): [IErrorDescription[]?, RegisterUserDto?] {
         
+        const errors : IErrorDescription[] = [];
         const { name, email, password, fromOAuth } = body;
         
-        if (!name)                         return ['Name is missing'];
-        if (!email)                        return ['Email is missing'];              
-        if (!Validators.email.test(email)) return ['Email is invalid'];
+        if (!name)                                  errors.push({ message: 'Name is required' });
+        if (!email)                                 errors.push({ message: 'Email is required' });
+        if (email && !Validators.email.test(email)) errors.push({ message: 'Email is invalid' });
         if (!fromOAuth) {
-            if (!password)                 return ['Password is missing'];                   
-            if (password.length < 8)       return ['Password is too short'];
+            if (!password)                             errors.push({ message: 'Password is required' });;                   
+            if (password && password.length < 8)       errors.push({ message: 'Password is too short' });
         } 
+        
+        if (errors.length > 0) return [ errors, undefined ];
 
         return [
             undefined,

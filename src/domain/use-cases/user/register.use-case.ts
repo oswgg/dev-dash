@@ -5,6 +5,7 @@ import { RegisterUserDto } from "../../dtos/user";
 import { UserEntity } from "../../entities/user.entity";
 import { UserRepository } from "../../repositories";
 import { SIGN_TOKEN, USER_REPOSITORY } from "../../../infrastructure/di/tokens";
+import { InternalServerException } from "../../errors/errors.custom";
 
 type UserTokenResponse = {
     token: string;
@@ -26,7 +27,7 @@ export class RegisterUser {
         
         const token = await this.signToken({ id: user.id });
         
-        if (!token) throw new Error('Token is not generated');
+        if (!token) throw new InternalServerException('Token was not generated');
         
         const userTokenResponse: UserTokenResponse = {
             token: token,

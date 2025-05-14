@@ -6,6 +6,7 @@ import { ImplementationEntity } from "../../domain/entities";
 import { isQueryFilter, QueryFilter, QueryUpdate } from "../../types/filter.types";
 import { ImplementationMapper } from "../mappers/implementation.mapper";
 import { IMPLEMENTATION_DATASOURCE } from "../di/tokens";
+import { DuplicatedException } from "../../domain/errors/errors.custom";
 
 
 
@@ -21,7 +22,7 @@ export class MongoImplementationDataSourceImpl implements ImplementationDataSour
         try {
 
             const userHasImplementation = await ImplementationModel.findOne({ userId, service });
-            if (userHasImplementation) throw new Error(`User already has ${service} implementation`);
+            if (userHasImplementation) throw new DuplicatedException('Duplicated', `User already has ${service} implementation`);
 
             const implementation = await ImplementationModel.create({
                 userId,

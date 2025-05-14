@@ -1,6 +1,6 @@
 import { Inject } from "@nestjs/common";
 import { UserDataSource } from "../../domain/datasources";
-import { AuthenticateUserDto, LoginUserDto, RegisterUserDto } from "../../domain/dtos/user";
+import { LoginUserDto, RegisterUserDto } from "../../domain/dtos/user";
 import { UserEntity } from "../../domain/entities";
 import { UserRepository } from "../../domain/repositories";
 import { USER_DATASOURCE } from "../di/tokens";

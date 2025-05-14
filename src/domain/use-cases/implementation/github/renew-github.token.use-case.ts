@@ -1,7 +1,7 @@
-import { QueryOperator } from "../../../../types/filter.types";
 import { GithubAdapter } from "../../../../config/github";
 import { ImplementationEntity } from "../../../entities";
 import { ImplementationRepository } from "../../../repositories";
+import { ForbiddenException, NotFoundException } from "../../../errors/errors.custom";
 
 
 
@@ -14,7 +14,7 @@ export class RenewGithubToken {
     
     async execute(userId: any): Promise<ImplementationEntity | null> {
         const ghImplementation = await this.implementationRepository.getOne({ userId, service: 'github' })
-        if (!ghImplementation) throw new Error('User has no github implementation');
+        if (!ghImplementation) throw new ForbiddenException('Forbidden', 'User has no github implementation');
         
         const { access_token, refresh_token } = await GithubAdapter.getTokenByRefreshToken(ghImplementation.refreshToken);
         
@@ -29,7 +29,7 @@ export class RenewGithubToken {
             }
         });
         
-        if (!implementation) throw new Error('Implementation not found');
+        if (!implementation) throw new NotFoundException('Not Found', 'Implementation not found');
 
         if (implementation.accessToken === ghImplementation.accessToken  // Tokens are the same
         && implementation.refreshToken === ghImplementation.refreshToken) return null;
