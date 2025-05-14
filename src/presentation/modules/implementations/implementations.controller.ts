@@ -34,7 +34,7 @@ export class ImplementationsController {
     
     @Get(':implementation')
     async isImplementationActive(
-        @Param  ('implementation') implementation: ImplementationService,
+        @Param ('implementation') implementation: ImplementationService,
         @Res() res: Response,
         @Req() req: Request
     ): Promise<any> {

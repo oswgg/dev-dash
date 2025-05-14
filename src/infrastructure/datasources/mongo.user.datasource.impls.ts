@@ -1,13 +1,13 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { BcryptAdapter, comparePasswordFunction, hashPasswordFunction } from "../../config/bcrypt";
-import { CompareTokenFunction, JwtAdapter } from "../../config/jwt";
+import { comparePasswordFunction, hashPasswordFunction } from "../../config/bcrypt";
+import { CompareTokenFunction } from "../../config/jwt";
 import { UserModel } from "../../data/mongoose/models";
 import { UserDataSource } from "../../domain/datasources";
 import { LoginUserDto, RegisterUserDto } from "../../domain/dtos/user";
 import { UserEntity } from "../../domain/entities";
 import { UserMapper } from "../mappers";
 import { COMPARE_PASSWORD, COMPARE_TOKEN, HASH_PASSWORD } from "../di/tokens";
-import { DuplicatedException, ForbiddenException, NotFoundException } from "../../domain/errors/errors.custom";
+import { DuplicatedException, ForbiddenException, NotFoundException, UnauthorizedException } from "../../domain/errors/errors.custom";
 
 
 
@@ -63,7 +63,7 @@ export class MongoUserDataSourceImpls implements UserDataSource {
         try {
             
             const user = await UserModel.findOne({ _id: userID });
-            if (!user) throw new NotFoundException('Not Found', `Token's user was not found`);
+            if (!user) throw new UnauthorizedException('Invalid Token', `Token's user was not found`);
             
             const userEntity = UserMapper.fromObjectToEntity(user);
             
