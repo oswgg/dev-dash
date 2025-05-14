@@ -14,6 +14,7 @@ export class HttpExceptionMiddleware implements ExceptionFilter {
         const status = exception.statusCode;
 
         return response.status(status).json({
+            status: status,
             message: exception.message,
             description: exception.description || null,
             errors: exception.errors

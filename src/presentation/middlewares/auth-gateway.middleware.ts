@@ -6,13 +6,13 @@ import { CompareTokenFunction, JwtAdapter } from "../../config/jwt";
 
 
 export class AuthGatewayMiddleware {
-    
+
     static compareToken: CompareTokenFunction = JwtAdapter.compare;
 
     static async use(socket: Socket, next: any) {
         const token = socket.handshake?.auth?.token;
-        if (!token)  throw new BadRequestException('Missing Token', 'Token is required for authentication');
-        
+        if (!token) return next(new BadRequestException('Missing Token', 'Token is required for authentication'));
+
         const decoded: { id: any } = await JwtAdapter.compare(token);
 
         if (!decoded) return next(new UnauthorizedException('Invalid Token', 'Authentication token is invalid'));

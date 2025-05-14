@@ -14,19 +14,18 @@ export class AuthMiddleware implements NestMiddleware {
     ) {}
 
     async use(req: Request, res: Response, next: NextFunction) {
-            const token = this.extractToken(req);
-            
-            if (!token) {
-                throw new UnauthorizedException('Missing Token', 'Token is required for authentication');
-            }
-            
-            const user = await new AuthUser(this.userRepository).execute(token);
-            req.user = UserMapper.noPassword(user);
-            next();
+        const token = this.extractToken(req);
+        
+        if (!token) {
+            return next(new UnauthorizedException('Missing Token', 'Token is required for authentication'));
+        }
+        
+        const user = await new AuthUser(this.userRepository).execute(token);
+        req.user = UserMapper.noPassword(user);
+        next();
     }
 
     private extractToken(req: Request): string | null {
-        // Check header authorization (most secure)
         const authHeader = req.headers.authorization;
         if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
             return authHeader.split(' ')[1];
