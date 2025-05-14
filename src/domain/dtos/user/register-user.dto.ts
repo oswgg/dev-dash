@@ -22,7 +22,7 @@ export class RegisterUserDto {
         if (email && !Validators.email.test(email)) errors.push({ message: 'Email is invalid' });
         if (!fromOAuth) {
             if (!password)                             errors.push({ message: 'Password is required' });;                   
-            if (password && password.length < 8)       errors.push({ message: 'Paswword is to short' });
+            if (password && password.length < 8)       errors.push({ message: 'Password is too short' });
         } 
         
         if (errors.length > 0) return [ errors, undefined ];
