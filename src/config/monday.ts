@@ -81,7 +81,7 @@ export class MondayAdapter extends MondayApi {
             
         } catch (error: any) {
             this.logger.error(error);
-            throw new Error(error);
+            throw error;
         }
     }
 
