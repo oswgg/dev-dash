@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app";
 import { MongoDatabase } from "./data/mongoose/mongo-database";
