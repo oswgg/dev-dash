@@ -22,6 +22,10 @@ export class UserRepositoryImpl implements UserRepository {
         return this.userDataSource.login(loginUserDto);
     }
     
+    async loginWithOAuth(email: string): Promise<UserEntity> {
+        return this.userDataSource.loginWithOAuth(email);
+    }
+    
     async authenticate(authenticateUserDto: UserEntity['id']): Promise<UserEntity> {
         return this.userDataSource.authenticate(authenticateUserDto);
     }

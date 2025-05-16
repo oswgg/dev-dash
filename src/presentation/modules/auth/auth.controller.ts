@@ -8,7 +8,8 @@ import { USER_REPOSITORY } from "../../../infrastructure/di/tokens";
 import { IGcpAdpater } from "../../../config/googleapi";
 import { CryptoAdapter } from "../../../config/crypt";
 import { RequestWithSession } from "../../../types/express";
-import { BadRequestException, UnauthorizedException } from "../../../domain/errors/errors.custom";
+import { BadRequestException, DuplicatedException, UnauthorizedException } from "../../../domain/errors/errors.custom";
+import { LOGIN_WITH_OAUTH, LoginWithOAuth } from "../../../domain/use-cases/user/login-oauth.use-case";
 
 
 @Controller('auth')
@@ -17,6 +18,7 @@ export class AuthController {
     constructor(
         @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
         @Inject(REGISTER_USER) private readonly registerUser: RegisterUser,
+        @Inject(LOGIN_WITH_OAUTH) private readonly loginWithOAuth: LoginWithOAuth,
         private readonly gcpAdapter: IGcpAdpater
     ) { }
 
@@ -31,7 +33,6 @@ export class AuthController {
 
         return await this.registerUser.execute(user!);
     }
-
 
     @Post('login')
     async login(
@@ -72,6 +73,47 @@ export class AuthController {
         const url = this.gcpAdapter.getAuthURL(state.toString());
 
         res.status(200).json({ url });
+    }
+    
+    @Get('oauth/google/login')
+    async googleOAuthLogin(
+        @Req() req: RequestWithSession,
+    ) {
+        const { code, state } = req.body;
+        const helperurl = new URL(`http://a.com?${state}`); 
+        const query = helperurl.searchParams;
+
+        const stateSession = query.get('sessionId'); 
+        
+        if (!req.session.oauthState)
+            throw new UnauthorizedException('Missing Session', 'No session id was found');
+
+        const { sessionId, timestamp, used } = req.session.oauthState;
+        
+        if (stateSession !== sessionId) 
+            throw new UnauthorizedException('Invalid Session', 'Invalid session');
+
+        if (Date.now() - timestamp > 60000)
+            throw new UnauthorizedException('Invalid Session', 'Session expired');
+
+        if (used)
+            throw new UnauthorizedException('Invalid Session', 'Session already used');
+
+        req.session.oauthState.used = true;
+        await new Promise<void>((resolve, reject) => {
+            req.session.save((err) => {
+                if (err) reject(err);
+                else resolve();
+            })
+        });
+        
+        if (!code)  
+            throw new BadRequestException('Bad Request', 'Code is missing');
+
+        await this.gcpAdapter.setCredentialsByCode(code)
+        
+        const userDataFromGCP = await this.gcpAdapter.getUserData();
+        return  await this.loginWithOAuth.execute(userDataFromGCP.email!);
     }
 
     @Post('oauth/google/callback')
@@ -122,6 +164,15 @@ export class AuthController {
         
         if (errors) throw new BadRequestException('Invalid Body', 'Some fields are invalid', errors);
         
-        return await this.registerUser.execute(registerUserDto!);
+        try {
+            // Try to register the user 
+            return await this.registerUser.execute(registerUserDto!);
+        } catch (error: any) {
+            // If the user already exists, we just login with the existing user
+            if (error instanceof DuplicatedException)
+               return  await this.loginWithOAuth.execute(userDataFromGCP.email!);
+           
+            throw error;
+        }
     }
 }

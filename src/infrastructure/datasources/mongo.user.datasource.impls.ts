@@ -59,6 +59,13 @@ export class MongoUserDataSourceImpls implements UserDataSource {
         }
     }
     
+    async loginWithOAuth(email: string): Promise<UserEntity> {
+        const user = await UserModel.findOne({ email });
+        if (!user) throw new NotFoundException('Not Found', 'User with this email was not found', { sent: { email } });
+        
+        return UserMapper.fromObjectToEntity(user);
+    }
+    
     async authenticate(userID: UserEntity['id']): Promise<UserEntity> {
         try {
             

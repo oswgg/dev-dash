@@ -7,7 +7,7 @@ import { UserRepository } from "../../repositories";
 import { SIGN_TOKEN, USER_REPOSITORY } from "../../../infrastructure/di/tokens";
 import { InternalServerException } from "../../errors/errors.custom";
 
-type UserTokenResponse = {
+export type UserTokenResponse = {
     token: string;
     user: Omit<UserEntity, 'password'>;
 }
