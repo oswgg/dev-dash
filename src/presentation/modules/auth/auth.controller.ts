@@ -10,6 +10,7 @@ import { CryptoAdapter } from "../../../config/crypt";
 import { RequestWithSession } from "../../../types/express";
 import { BadRequestException, DuplicatedException, UnauthorizedException } from "../../../domain/errors/errors.custom";
 import { LOGIN_WITH_OAUTH, LoginWithOAuth } from "../../../domain/use-cases/user/login-oauth.use-case";
+import { EmailService } from "../../../domain/services/email.service";
 
 
 @Controller('auth')
@@ -19,7 +20,8 @@ export class AuthController {
         @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
         @Inject(REGISTER_USER) private readonly registerUser: RegisterUser,
         @Inject(LOGIN_WITH_OAUTH) private readonly loginWithOAuth: LoginWithOAuth,
-        private readonly gcpAdapter: IGcpAdpater
+        private readonly gcpAdapter: IGcpAdpater,
+        private readonly emailService: EmailService
     ) { }
 
     @Post('register')
@@ -44,6 +46,17 @@ export class AuthController {
         if (errors) throw new BadRequestException('Invalid Body', 'Some fields are invalid', errors);
         
         return await new LoginUser(this.userRepository).execute(user!)
+    }
+    
+    @Post('forgot-password')
+    async forgotPassword(
+        @Body() body: { email: string }
+    ) {
+        const { email } = body;
+        
+        if (!email) throw new BadRequestException('Invalid Body', 'Email is missing');
+        
+        return await this.emailService.sendResetPasswordEmail(email);
     }
 
     @Get('oauth/google')

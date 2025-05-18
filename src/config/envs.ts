@@ -16,4 +16,7 @@ export const envs = {
     GCP_CLIENT_ID: get('GCP_CLIENT_ID').required().asString(),
     GCP_CLIENT_SECRET: get('GCP_CLIENT_SECRET').required().asString(),
     GCP_REDIRECT_URI: get('GCP_REDIRECT_URI').required().asString(),
+    GMAIL_USER: get('GMAIL_USER').required().asString(),
+    GMAIL_PASSWORD: get('GMAIL_PASSWORD').required().asString(),
+    FRONT_URL: get('FRONT_URL').required().asString(),
 }
